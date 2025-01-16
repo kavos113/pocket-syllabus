@@ -1,48 +1,43 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { invoke } from "@tauri-apps/api/core";
+import { ref } from 'vue';
+import { invoke } from '@tauri-apps/api/core';
+import './styles/style.css';
+import Title from './components/Title.vue';
+import Content from './components/Content.vue';
 
-const greetMsg = ref("");
-const name = ref("");
+const greetMsg = ref('');
+const name = ref('');
 
 async function greet() {
   // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-  greetMsg.value = await invoke("greet", { name: name.value });
+  greetMsg.value = await invoke('greet', { name: name.value });
 }
 </script>
 
 <template>
   <main class="container">
-    <h1>Welcome to Tauri + Vue</h1>
-
-    <div class="row">
-      <a href="https://vitejs.dev" target="_blank">
-        <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-      </a>
-      <a href="https://tauri.app" target="_blank">
-        <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-      </a>
-      <a href="https://vuejs.org/" target="_blank">
-        <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-      </a>
+    <div class="main">
+      <Title />
+      <Content />
     </div>
-    <p>Click on the Tauri, Vite, and Vue logos to learn more.</p>
-
-    <form class="row" @submit.prevent="greet">
-      <input id="greet-input" v-model="name" placeholder="Enter a name..." />
-      <button type="submit">Greet</button>
-    </form>
-    <p>{{ greetMsg }}</p>
   </main>
 </template>
 
 <style scoped>
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
+.container {
+  width: 100%;
+  height: 100vh;
+  background: var(--grayborder);
 }
 
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #249b73);
+.main {
+  display: flex;
+  width: calc(100% - 40px);
+  height: calc(100% - 35px);
+  padding: 25px 20px 10px 20px;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
-
 </style>
