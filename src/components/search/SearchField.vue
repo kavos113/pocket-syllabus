@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import FetchButton from './FetchButton.vue';
-import SearchField from './SearchField.vue';
+import SearchBoxes from './SearchBoxes.vue';
+import SearchConditions from './SearchConditions.vue';
 </script>
 
 <template>
   <div class="container">
-    <FetchButton />
-    <SearchField />
+    <SearchBoxes />
+    <SearchConditions />
   </div>
 </template>
 
@@ -15,7 +15,7 @@ import SearchField from './SearchField.vue';
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 77px;
-  flex-shrink: 0;
+  gap: 61px;
+  align-self: stretch;
 }
 </style>
