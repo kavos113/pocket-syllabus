@@ -7,17 +7,22 @@
 </template>
 
 <style scoped>
+.container {
+  width: 100%;
+  height: 65px;
+}
+
 .title {
   width: 100%;
   height: 60px;
   flex-shrink: 0;
   color: var(--3black);
-  font-family: 'Mplus 1p Bold', var(--font), sans-serif;
+  font-family: 'M PLUS 1p Medium', var(--font), sans-serif;
   font-size: 40px;
   font-style: normal;
   font-weight: 700;
   line-height: normal;
-  border-bottom: 2px solid var(--stsub);
+  border-bottom: 4px solid var(--stmain);
   margin: 0;
 }
 
@@ -25,9 +30,8 @@
   content: '';
   display: block;
   width: 100%;
-  height: 4px;
-  background-color: var(--stmain);
-  bottom: 0;
-  left: 0;
+  height: 2px;
+  background-color: var(--stsub);
+  margin-top: 6px;
 }
 </style>
