@@ -4,7 +4,7 @@ import SearchBox from '../common/SearchBox.vue';
 </script>
 
 <template>
-  <div class="container">
+  <div class="search-box-wrapper">
     <ComboBox />
     <ComboBox />
     <ComboBox />
@@ -14,7 +14,7 @@ import SearchBox from '../common/SearchBox.vue';
 </template>
 
 <style scoped>
-.container {
+.search-box-wrapper {
   display: flex;
   width: 100%;
   flex-direction: column;

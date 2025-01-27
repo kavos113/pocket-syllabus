@@ -3,14 +3,14 @@ import SimpleButton from '../common/SimpleButton.vue';
 </script>
 
 <template>
-  <div class="container">
+  <div class="button-wrapper">
     <SimpleButton text="Fetch" />
     <SimpleButton text="Fetch-Test" />
   </div>
 </template>
 
 <style scoped>
-.container {
+.button-wrapper {
   display: flex;
   align-items: center;
   flex-direction: row;

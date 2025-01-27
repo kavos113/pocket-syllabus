@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="container"></div>
+  <div class="check-box-container"></div>
 </template>
 
 <style scoped></style>

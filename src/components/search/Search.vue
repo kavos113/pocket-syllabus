@@ -4,14 +4,14 @@ import SearchField from './SearchField.vue';
 </script>
 
 <template>
-  <div class="container">
+  <div class="search-wrapper">
     <FetchButton />
     <SearchField />
   </div>
 </template>
 
 <style scoped>
-.container {
+.search-wrapper {
   display: flex;
   flex-direction: column;
   align-items: flex-start;

@@ -4,14 +4,14 @@ import Search from './search/Search.vue';
 </script>
 
 <template>
-  <div class="container">
+  <div class="content-container">
     <ListTable class="table" />
     <Search class="search" />
   </div>
 </template>
 
 <style scoped>
-.container {
+.content-container {
   display: grid;
   width: 100%;
   height: calc(100% - 74px);

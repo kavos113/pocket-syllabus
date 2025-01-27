@@ -1,13 +1,13 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="container">
+  <div class="title-container">
     <p class="title">Pocket Syllabus</p>
   </div>
 </template>
 
 <style scoped>
-.container {
+.title-container {
   width: 100%;
   height: 65px;
 }

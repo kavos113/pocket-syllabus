@@ -4,14 +4,14 @@ import SearchConditions from './SearchConditions.vue';
 </script>
 
 <template>
-  <div class="container">
+  <div class="search-container">
     <SearchBoxes />
     <SearchConditions />
   </div>
 </template>
 
 <style scoped>
-.container {
+.search-container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;

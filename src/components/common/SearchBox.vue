@@ -5,13 +5,13 @@ const text = ref<string>('Hello, Vue 3!');
 </script>
 
 <template>
-  <div class="container">
+  <div class="search-box-container">
     <p class="text">{{ text }}</p>
   </div>
 </template>
 
 <style scoped>
-.container {
+.search-box-container {
   width: 352px;
   height: 28px;
   flex-shrink: 0;

@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="container">
+  <div class="item-wrapper">
     <div class="item university">
       <p class="text">大学名</p>
     </div>
@@ -48,7 +48,7 @@
   padding-left: 5px;
 }
 
-.container {
+.item-wrapper {
   display: grid;
   grid-template-columns: repeat(24, 1fr);
   grid-template-rows: 1fr;

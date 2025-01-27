@@ -7,7 +7,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div class="container">
+  <div class="item-wrapper">
     <div class="item university">
       <p class="text">{{ props.item.university }}</p>
     </div>
@@ -54,7 +54,7 @@ const props = defineProps<{
   padding-left: 5px;
 }
 
-.container {
+.item-wrapper {
   display: grid;
   grid-template-columns: repeat(24, 1fr);
   grid-template-rows: 1fr;

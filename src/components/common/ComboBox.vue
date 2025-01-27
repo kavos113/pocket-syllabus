@@ -5,13 +5,13 @@ const text = ref<string>('Hello, Vue 3!');
 </script>
 
 <template>
-  <div class="container">
+  <div class="combobox-box-container">
     <p class="text">{{ text }}</p>
   </div>
 </template>
 
 <style scoped>
-.container {
+.combobox-box-container {
   width: 270px;
   height: 28px;
   flex-shrink: 0;
