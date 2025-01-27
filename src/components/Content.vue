@@ -5,8 +5,8 @@ import Search from './search/Search.vue';
 
 <template>
   <div class="content-container">
-    <ListTable class="table" />
     <Search class="search" />
+    <ListTable class="table" />
   </div>
 </template>
 
@@ -22,12 +22,12 @@ import Search from './search/Search.vue';
 }
 
 .table {
-  grid-column: 1 / 3;
+  grid-column: 2 / 4;
   grid-row: 1 / 2;
 }
 
 .search {
-  grid-column: 3 / 4;
+  grid-column: 1 / 2;
   grid-row: 1 / 2;
 }
 </style>
