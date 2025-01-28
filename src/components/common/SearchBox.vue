@@ -15,7 +15,6 @@ const text = ref<string>('Hello, Vue 3!');
   width: 352px;
   height: 28px;
   flex-shrink: 0;
-  border-radius: 12px;
   background: var(--white);
 }
 

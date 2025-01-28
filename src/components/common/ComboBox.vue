@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import ComboBoxMenu from './ComboBoxMenu.vue';
 
-const text = ref<string>('Hello, Vue 3!');
+const props = defineProps<{
+  items: object;
+}>();
 </script>
 
 <template>
   <div class="combobox-box-container">
-    <p class="text">{{ text }}</p>
+    <div class="comboMenu">
+      <ComboBoxMenu :items="props.items" />
+    </div>
   </div>
 </template>
 
@@ -17,22 +21,21 @@ const text = ref<string>('Hello, Vue 3!');
   flex-shrink: 0;
   border-radius: 12px;
   background: var(--white);
+  position: relative;
 }
 
-.text {
-  display: flex;
-  width: 100%;
-  height: 28px;
-  flex-direction: column;
-  justify-content: center;
-  flex-shrink: 0;
-  color: var(--allblack, #000);
-  font-family: 'Rounded Mplus 1c Medium', var(--font), sans-serif;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-  margin: 0;
-  padding-left: 12px;
+.comboMenu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 270px;
+  border-radius: 12px;
+  background: var(--white);
+}
+
+.comboMenu > .menu {
+  background: var(--ablack);
+  box-shadow: none;
+  border-radius: 12px;
 }
 </style>

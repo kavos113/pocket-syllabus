@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import ComboBox from '../common/ComboBox.vue';
 import SearchBox from '../common/SearchBox.vue';
+import { DEPARTMENTS, UNIVERCITIES, YEARS } from '../../scripts/consts.ts';
 </script>
 
 <template>
   <div class="search-box-wrapper">
-    <ComboBox />
-    <ComboBox />
-    <ComboBox />
+    <ComboBox :items="UNIVERCITIES" />
+    <ComboBox :items="DEPARTMENTS" />
+    <ComboBox :items="YEARS" />
     <SearchBox />
     <SearchBox />
   </div>
