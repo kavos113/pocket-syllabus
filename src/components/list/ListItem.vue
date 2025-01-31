@@ -15,7 +15,7 @@ const props = defineProps<{
       <p class="text">{{ props.item.code }}</p>
     </div>
     <div class="item name">
-      <p class="text">{{ props.item.name }}</p>
+      <p class="text">{{ props.item.title }}</p>
     </div>
     <div class="item lecturer">
       <p class="text">{{ props.item.lecturer }}</p>

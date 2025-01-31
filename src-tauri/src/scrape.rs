@@ -1,7 +1,7 @@
 use scraper::{ElementRef, Html, Selector};
 
 #[derive(Debug)]
-pub struct Course {
+pub struct CourseAbstract {
     code: String,
     title: CourseTitle,
     lecturer: Vec<Lecturer>,
@@ -22,7 +22,79 @@ pub struct Lecturer {
     url: String,
 }
 
-pub fn html_to_courses(html: &str) -> Vec<Course> {
+#[derive(Debug)]
+pub struct Course {
+    university: String,
+    title: String,
+    english_title: String,
+    department: String,
+    lecturer: Vec<Lecturer>,
+    lecture_type: String,
+    time_table: Vec<TimeTable>,
+    code: String,
+    credit: i32,
+    year: i32,
+    semester: Semester,
+    language: String,
+    url: String,
+    course_detail: CourseDetail
+}
+
+#[derive(Debug)]
+pub struct CourseDetail {
+    abst: String,
+    goal: String,
+    experience: bool,
+    keyword: Vec<String>,
+    competencies: Vec<String>,
+    flow: String,
+    schedule: String,
+    out_of_class: String,
+    textbook: String,
+    reference_book: String,
+    assessment: String,
+    related_course: String,
+    prerequisite: String,
+    note: String,
+}
+
+#[derive(Debug)]
+pub struct TimeTable {
+    day: Day,
+    period: Period,
+    room: String,
+}
+
+#[derive(Debug)]
+pub enum Day {
+    Monday,
+    Tuesday,
+    Wednesday,
+    Thursday,
+    Friday,
+    Saturday,
+    Sunday,
+}
+
+#[derive(Debug)]
+pub enum Period {
+    First,
+    Second,
+    Third,
+    Fourth,
+    Fifth,
+    Sixth,
+}
+
+#[derive(Debug)]
+pub enum Semester {
+    First,
+    Second,
+    Third,
+    Fourth,
+}
+
+pub fn html_to_courses(html: &str) -> Vec<CourseAbstract> {
     let mut courses = Vec::new();
 
     let document = Html::parse_document(html);
@@ -49,7 +121,7 @@ pub fn html_to_courses(html: &str) -> Vec<Course> {
         let start = row.select(&start_selector).next().unwrap();
         let sylbs_update = row.select(&sylbs_update_selector).next().unwrap();
 
-        courses.push(Course {
+        courses.push(CourseAbstract {
             code: get_code(code),
             title: get_course_title(course_title),
             lecturer: get_lecturer(lecturer),

@@ -1,8 +1,8 @@
 export interface Course {
   id: number;
   university: string;
-  name: string;
-  englishName: string;
+  title: string;
+  englishTitle: string;
   department: string;
   lecturer: Lecturer[];
   lectureType: string;
@@ -50,7 +50,7 @@ export interface CourseListItem {
   id: number;
   university: string;
   code: string;
-  name: string;
+  title: string;
   lecturer: string;
   timeTable: string;
   semester: string;
@@ -65,7 +65,7 @@ export const getSampleItems = (numSamples: number): CourseListItem[] => {
       id: i,
       university: `大学${i}`,
       code: `000${i}`,
-      name: `コース${i}`,
+      title: `コース${i}`,
       lecturer: `講師${i}`,
       timeTable: `月${i}, 木${i}`,
       semester: '2024前期',
