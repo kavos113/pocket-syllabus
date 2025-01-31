@@ -1,7 +1,7 @@
-use crate::scrape::html_to_courses;
+use crate::scrape::html_to_course_abstracts;
 
-mod scrape;
 mod sample;
+mod scrape;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -19,21 +19,17 @@ fn fetch_test() {
 
     let res = sample::get_sample_main();
 
-    let courses = html_to_courses(&res);
+    let courses = html_to_course_abstracts(&res);
 
     println!("{:?}", courses.len());
     println!("{:?}", courses[1]);
-
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![
-            greet,
-            fetch_test
-        ])
+        .invoke_handler(tauri::generate_handler![greet, fetch_test])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
