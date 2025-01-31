@@ -63,33 +63,53 @@ pub fn html_to_courses(html: &str) -> Vec<Course> {
 }
 
 fn get_code(td: ElementRef) -> String {
-    td.text().next().unwrap().trim().to_string()
+    td.inner_html().trim().to_string()
 }
 
 fn get_course_title(td: ElementRef) -> CourseTitle {
-    let a = td.select(&Selector::parse("a").unwrap()).next().unwrap();
+    let a_err = td.select(&Selector::parse("a").unwrap()).next();
+    let a = match a_err {
+        Some(a) => a,
+        None => {
+            return CourseTitle {
+                title: "".to_string(),
+                url: "".to_string(),
+            };
+        },
+    };
     CourseTitle {
-        title: a.text().next().unwrap().trim().to_string(),
+        title: a.inner_html().trim().to_string(),
         url: a.value().attr("href").unwrap().to_string(),
     }
 }
 
 fn get_lecturer(td: ElementRef) -> Vec<Lecturer> {
-    let a = td.select(&Selector::parse("a").unwrap()).next().unwrap();
-    vec![Lecturer {
-        name: a.text().next().unwrap().trim().to_string(),
-        url: a.value().attr("href").unwrap().to_string(),
-    }]
+    let mut ret = Vec::new();
+    for a in td.select(&Selector::parse("a").unwrap()) {
+        ret.push(Lecturer {
+            name: a.inner_html().trim().to_string(),
+            url: a.value().attr("href").unwrap().to_string(),
+        });
+    }
+
+    ret
 }
 
 fn get_opening_department(td: ElementRef) -> String {
-    td.text().next().unwrap().trim().to_string()
+    let a_err = td.select(&Selector::parse("a").unwrap()).next();
+    let a = match a_err {
+        Some(a) => a,
+        None => {
+            return "".to_string();
+        },
+    };
+    a.inner_html().trim().to_string()
 }
 
 fn get_start(td: ElementRef) -> String {
-    td.text().next().unwrap().trim().to_string()
+    td.inner_html().trim().to_string()
 }
 
 fn get_sylbs_update(td: ElementRef) -> String {
-    td.text().next().unwrap().trim().to_string()
+    td.inner_html().trim().to_string()
 }

@@ -1,3 +1,5 @@
+use crate::scrape::html_to_courses;
+
 mod scrape;
 mod sample;
 
@@ -11,14 +13,16 @@ fn greet(name: &str) -> String {
 fn fetch_test() {
     println!("fetch_test");
 
-    let url = "https://www.ocw.titech.ac.jp/index.php?module=General&action=T0100&GakubuCD=1&lang=JA";
-    let rc = reqwest::blocking::get(url).unwrap();
-    let res = rc.text().unwrap();
+    // let url = "https://www.ocw.titech.ac.jp/index.php?module=General&action=T0100&GakubuCD=1&lang=JA";
+    // let rc = reqwest::blocking::get(url).unwrap();
+    // let res = rc.text().unwrap();
 
-    let courses = scrape::html_to_courses(&res);
+    let res = sample::get_sample_main();
+
+    let courses = html_to_courses(&res);
 
     println!("{:?}", courses.len());
-    println!("{:?}", courses[0]);
+    println!("{:?}", courses[1]);
 
 }
 

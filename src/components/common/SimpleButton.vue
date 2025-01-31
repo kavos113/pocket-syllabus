@@ -31,5 +31,11 @@ const props = defineProps<{
 .button {
   border-radius: 8px;
   background: var(--background);
+  cursor: pointer;
+  border: 1px solid var(--background);
+}
+
+.button:hover {
+  border: 1px solid var(--stmain);
 }
 </style>
