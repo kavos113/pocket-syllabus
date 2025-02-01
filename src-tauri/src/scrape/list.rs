@@ -68,7 +68,10 @@ fn get_course_title(td: ElementRef) -> CourseTitle {
     };
     CourseTitle {
         title: a.inner_html().trim().to_string(),
-        url: a.value().attr("href").unwrap().to_string(),
+        url: format!(
+            "https://www.ocw.titech.ac.jp/{}",
+            a.value().attr("href").unwrap()
+        ),
     }
 }
 
@@ -77,7 +80,10 @@ fn get_lecturer(td: ElementRef) -> Vec<Lecturer> {
     for a in td.select(&Selector::parse("a").unwrap()) {
         ret.push(Lecturer {
             name: a.inner_html().trim().to_string(),
-            url: a.value().attr("href").unwrap().to_string(),
+            url: format!(
+                "https://www.ocw.titech.ac.jp/{}",
+                a.value().attr("href").unwrap()
+            ),
         });
     }
 

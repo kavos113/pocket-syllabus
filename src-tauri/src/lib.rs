@@ -1,4 +1,4 @@
-use crate::scrape::html_to_course_abstracts;
+use crate::scrape::{html_to_course, html_to_course_abstracts};
 
 mod sample;
 mod scrape;
@@ -23,6 +23,11 @@ fn fetch_test() {
 
     println!("{:?}", courses.len());
     println!("{:?}", courses[1]);
+
+    let detail = sample::get_sample_sub();
+    let detail = html_to_course(&detail);
+
+    println!("{:?}", detail);
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
