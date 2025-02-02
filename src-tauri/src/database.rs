@@ -40,6 +40,7 @@ pub async fn insert_course(pool: &SqlitePool, course: &Course) -> DbResult<()> {
                     year,
                     language,
                     url,
+                    sylbs_update,
                     abstract,
                     goal,
                     experience,
@@ -52,7 +53,7 @@ pub async fn insert_course(pool: &SqlitePool, course: &Course) -> DbResult<()> {
                     contact,
                     office_hour,
                     note
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
     )
     .bind(&course.university)
     .bind(&course.title)
@@ -64,6 +65,7 @@ pub async fn insert_course(pool: &SqlitePool, course: &Course) -> DbResult<()> {
     .bind(&course.year)
     .bind(&course.language)
     .bind(&course.url)
+    .bind(&course.sylbs_update)
     .bind(&course.course_detail.abst)
     .bind(&course.course_detail.goal)
     .bind(&course.course_detail.experience)
@@ -214,4 +216,31 @@ pub async fn insert_course(pool: &SqlitePool, course: &Course) -> DbResult<()> {
     tx.commit().await?;
 
     Ok(())
+}
+
+pub async fn check_sylbs_update(
+    pool: &SqlitePool,
+    code: &str,
+    title: &str,
+    sylbs_update: &str,
+) -> DbResult<bool> {
+    let mut tx = pool.begin().await?;
+
+    let row = sqlx::query("SELECT sylbs_update FROM courses WHERE code = ? AND title = ?")
+        .bind(code)
+        .bind(title)
+        .fetch_optional(&mut *tx)
+        .await?;
+
+    let result = match row {
+        Some(row) => {
+            let db_sylbs_update: String = row.try_get("sylbs_update")?;
+            db_sylbs_update == sylbs_update
+        }
+        None => false,
+    };
+
+    tx.commit().await?;
+
+    Ok(result)
 }

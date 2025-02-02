@@ -18,6 +18,7 @@ pub struct Course {
     pub semester: Vec<Semester>,
     pub language: String,
     pub url: String,
+    pub sylbs_update: String,
     pub course_detail: CourseDetail,
 }
 
@@ -223,6 +224,7 @@ pub fn html_to_course(html: &str) -> Course {
         semester,
         language,
         url,
+        sylbs_update: "".to_string(),
         course_detail,
     }
 }
@@ -295,13 +297,10 @@ fn get_timetable(dd: ElementRef) -> Vec<TimeTable> {
             _ => Day::Monday,
         };
 
-        let room = room_re
-            .captures(time_table_str)
-            .unwrap()
-            .get(1)
-            .unwrap()
-            .as_str()
-            .to_string();
+        let room = match room_re.captures(time_table_str) {
+            Some(caps) => caps.get(1).unwrap().as_str().to_string(),
+            None => "".to_string(),
+        };
 
         let period = time_table_str
             .chars()

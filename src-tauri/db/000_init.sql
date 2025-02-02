@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS courses(
     prerequisite TEXT,
     contact TEXT,
     office_hour TEXT,
-    note TEXT
+    note TEXT,
+    sylbs_update TEXT
 );
 
 CREATE TABLE IF NOT EXISTS lecturers(

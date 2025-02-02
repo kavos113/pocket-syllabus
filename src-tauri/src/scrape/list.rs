@@ -3,12 +3,12 @@ use scraper::{ElementRef, Html, Selector};
 
 #[derive(Debug)]
 pub struct CourseAbstract {
-    code: String,
-    title: CourseTitle,
+    pub code: String,
+    pub title: CourseTitle,
     lecturer: Vec<Lecturer>,
     department: String,
     start: String,
-    sylbs_update: String,
+    pub sylbs_update: String,
 }
 
 pub fn html_to_course_abstracts(html: &str) -> Vec<CourseAbstract> {
