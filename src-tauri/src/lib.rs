@@ -1,5 +1,6 @@
 use crate::scrape::{html_to_course, html_to_course_abstracts};
 use sqlx::SqlitePool;
+use std::{thread, time};
 use tauri::async_runtime::block_on;
 use tauri::{Emitter, Manager, State};
 
@@ -73,6 +74,7 @@ fn fetch(sqlite_pool: State<'_, SqlitePool>, app: State<'_, tauri::AppHandle>) {
         "https://www.ocw.titech.ac.jp/index.php?module=General&action=T0100&GakubuCD=1&lang=JA";
     let rc = reqwest::blocking::get(url).unwrap();
     let res = rc.text().unwrap();
+    thread::sleep(time::Duration::from_secs(10));
 
     let courses = html_to_course_abstracts(res.as_ref());
 
@@ -110,6 +112,13 @@ fn fetch(sqlite_pool: State<'_, SqlitePool>, app: State<'_, tauri::AppHandle>) {
         let mut detail = html_to_course(rc.text().unwrap().as_ref());
         detail.url = course.title.url;
         detail.sylbs_update = course.sylbs_update;
+        (*app)
+            .emit(
+                "fetch_status",
+                format!("Scraping: {}/{} courses: {}", now, length, detail.title),
+            )
+            .unwrap();
+        thread::sleep(time::Duration::from_secs(10));
 
         block_on(database::insert_course(&sqlite_pool, &detail)).unwrap();
 
