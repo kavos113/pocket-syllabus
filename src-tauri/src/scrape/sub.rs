@@ -5,39 +5,39 @@ use std::fmt;
 use std::fmt::Formatter;
 
 pub struct Course {
-    university: String,
-    title: String,
-    english_title: String,
-    department: String,
-    lecturer: Vec<Lecturer>,
-    lecture_type: String,
-    time_table: Vec<TimeTable>,
-    code: String,
-    credit: i32,
-    year: i32,
-    semester: Vec<Semester>,
-    language: String,
-    url: String,
-    course_detail: CourseDetail,
+    pub university: String,
+    pub title: String,
+    pub english_title: String,
+    pub department: String,
+    pub lecturer: Vec<Lecturer>,
+    pub lecture_type: String,
+    pub time_table: Vec<TimeTable>,
+    pub code: String,
+    pub credit: i32,
+    pub year: i32,
+    pub semester: Vec<Semester>,
+    pub language: String,
+    pub url: String,
+    pub course_detail: CourseDetail,
 }
 
 pub struct CourseDetail {
-    abst: String,
-    goal: String,
-    experience: bool,
-    keyword: Vec<String>,
-    competencies: Vec<String>,
-    flow: String,
-    schedule: Vec<LecturePlan>,
-    out_of_class: String,
-    textbook: String,
-    reference_book: String,
-    assessment: String,
-    related_course: Vec<String>,
-    prerequisite: String,
-    contact: String,
-    office_hour: String,
-    note: String,
+    pub abst: String,
+    pub goal: String,
+    pub experience: bool,
+    pub keyword: Vec<String>,
+    pub competencies: Vec<String>,
+    pub flow: String,
+    pub schedule: Vec<LecturePlan>,
+    pub out_of_class: String,
+    pub textbook: String,
+    pub reference_book: String,
+    pub assessment: String,
+    pub related_course: Vec<String>,
+    pub prerequisite: String,
+    pub contact: String,
+    pub office_hour: String,
+    pub note: String,
 }
 
 impl fmt::Debug for CourseDetail {
@@ -62,16 +62,16 @@ impl fmt::Debug for Course {
 
 #[derive(Debug)]
 pub struct TimeTable {
-    day: Day,
-    period: Period,
-    room: String,
+    pub day: Day,
+    pub period: Period,
+    pub room: String,
 }
 
 #[derive(Debug)]
 pub struct LecturePlan {
-    count: i32,
-    plan: String,
-    assignment: String,
+    pub count: i32,
+    pub plan: String,
+    pub assignment: String,
 }
 
 #[derive(Debug, Clone)]

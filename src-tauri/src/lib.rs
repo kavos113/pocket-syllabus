@@ -1,9 +1,10 @@
-use crate::database::get_migrations;
 use crate::scrape::{html_to_course, html_to_course_abstracts};
 
 mod database;
 mod sample;
 mod scrape;
+
+pub use scrape::Course;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -21,13 +22,13 @@ fn fetch_test() {
 
     let res = sample::get_sample_main();
 
-    let courses = html_to_course_abstracts(&res);
+    let courses = html_to_course_abstracts((&res).as_ref());
 
     println!("{:?}", courses.len());
     println!("{:?}", courses[1]);
 
     let detail = sample::get_sample_sub();
-    let detail = html_to_course(&detail);
+    let detail = html_to_course((&detail).as_ref());
 
     println!("{:?}", detail);
 }

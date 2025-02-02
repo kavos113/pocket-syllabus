@@ -69,3 +69,12 @@ CREATE TABLE IF NOT EXISTS related_courses(
     FOREIGN KEY (course_id) REFERENCES courses(id),
     FOREIGN KEY (related_course_id) REFERENCES courses(id)
 );
+
+CREATE TABLE IF NOT EXISTS schedules(
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    course_id INTEGER NOT NULL,
+    count INTEGER NOT NULL,
+    plan TEXT NOT NULL,
+    assignment TEXT NOT NULL,
+    FOREIGN KEY (course_id) REFERENCES courses(id)
+);
