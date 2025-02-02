@@ -259,11 +259,14 @@ fn get_lecturer(dd: ElementRef) -> Vec<Lecturer> {
 }
 
 fn get_lecture_type(dd: ElementRef) -> String {
-    dd.inner_html()
+    let mut text = dd
+        .inner_html()
         .trim()
         .to_string()
         .replace("\n", "")
-        .replace("&nbsp;", "")
+        .replace("&nbsp;", "");
+    text.retain(|c| !c.is_whitespace());
+    text
 }
 
 fn get_timetable(dd: ElementRef) -> Vec<TimeTable> {
@@ -656,7 +659,7 @@ fn get_keywords(p: ElementRef) -> Vec<String> {
 
 fn get_competencies(div: ElementRef) -> Vec<String> {
     let mut competencies = Vec::new();
-    for element in div.select(&Selector::parse("skill_checked2").unwrap()) {
+    for element in div.select(&Selector::parse(".skill_checked2").unwrap()) {
         competencies.push(element.inner_html().trim().to_string());
     }
 

@@ -1,7 +1,7 @@
 use crate::scrape::{Day, Period, Semester};
 use crate::Course;
 use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteSynchronous};
-use sqlx::SqlitePool;
+use sqlx::{Row, SqlitePool};
 use std::str::FromStr;
 
 type DbResult<T> = Result<T, Box<dyn std::error::Error>>;
@@ -76,12 +76,13 @@ pub async fn insert_course(pool: &SqlitePool, course: &Course) -> DbResult<()> {
     .bind(&course.course_detail.contact)
     .bind(&course.course_detail.office_hour)
     .bind(&course.course_detail.note)
-    .execute(&mut tx)
+    .execute(&mut *tx)
     .await?;
 
     let last_id = sqlx::query("SELECT last_insert_rowid() as id")
-        .fetch_one(&mut tx)
-        .await?;
+        .fetch_one(&mut *tx)
+        .await?
+        .try_get::<i64, _>("id")?;
 
     for teacher in &course.lecturer {
         sqlx::query(
@@ -91,10 +92,10 @@ pub async fn insert_course(pool: &SqlitePool, course: &Course) -> DbResult<()> {
                 url
             ) VALUES (?, ?, ?)",
         )
-        .bind(last_id.id)
+        .bind(last_id)
         .bind(&teacher.name)
         .bind(&teacher.url)
-        .execute(&mut tx)
+        .execute(&mut *tx)
         .await?;
     }
 
@@ -103,11 +104,11 @@ pub async fn insert_course(pool: &SqlitePool, course: &Course) -> DbResult<()> {
             "INSERT INTO timetables (
                 course_id,
                 day,
-                period,
+                periods,
                 room
             ) VALUES (?, ?, ?, ?)",
         )
-        .bind(last_id.id)
+        .bind(last_id)
         .bind(match &timetable.day {
             Day::Sunday => 0,
             Day::Monday => 1,
@@ -126,7 +127,7 @@ pub async fn insert_course(pool: &SqlitePool, course: &Course) -> DbResult<()> {
             Period::Sixth => 6,
         })
         .bind(&timetable.room)
-        .execute(&mut tx)
+        .execute(&mut *tx)
         .await?;
     }
 
@@ -137,14 +138,14 @@ pub async fn insert_course(pool: &SqlitePool, course: &Course) -> DbResult<()> {
                 semester
             ) VALUES (?, ?)",
         )
-        .bind(last_id.id)
+        .bind(last_id)
         .bind(match &sem {
             Semester::First => 1,
             Semester::Second => 2,
             Semester::Third => 3,
             Semester::Fourth => 4,
         })
-        .execute(&mut tx)
+        .execute(&mut *tx)
         .await?;
     }
 
@@ -155,9 +156,9 @@ pub async fn insert_course(pool: &SqlitePool, course: &Course) -> DbResult<()> {
                 keyword
             ) VALUES (?, ?)",
         )
-        .bind(last_id.id)
+        .bind(last_id)
         .bind(&key)
-        .execute(&mut tx)
+        .execute(&mut *tx)
         .await?;
     }
 
@@ -168,9 +169,9 @@ pub async fn insert_course(pool: &SqlitePool, course: &Course) -> DbResult<()> {
                 competency
             ) VALUES (?, ?)",
         )
-        .bind(last_id.id)
+        .bind(last_id)
         .bind(&competency)
-        .execute(&mut tx)
+        .execute(&mut *tx)
         .await?;
     }
 
@@ -183,30 +184,30 @@ pub async fn insert_course(pool: &SqlitePool, course: &Course) -> DbResult<()> {
                 assignment
             ) VALUES (?, ?, ?, ?)",
         )
-        .bind(last_id.id)
+        .bind(last_id)
         .bind(&schedule.count)
         .bind(&schedule.plan)
         .bind(&schedule.assignment)
-        .execute(&mut tx)
+        .execute(&mut *tx)
         .await?;
     }
 
+    tx.commit().await?;
+
+    let mut tx = pool.begin().await?;
+
     for related in &course.course_detail.related_course {
         let related_code = related.chars().take(8).collect::<String>();
-        let related_id = sqlx::query("SELECT id FROM courses WHERE code = ?")
-            .bind(&related_code)
-            .fetch_one(&mut tx)
-            .await?;
 
         sqlx::query(
             "INSERT INTO related_courses (
                 course_id,
-                related_id
+                related_course_code
             ) VALUES (?, ?)",
         )
-        .bind(last_id.id)
-        .bind(related_id.id)
-        .execute(&mut tx)
+        .bind(last_id)
+        .bind(related_code)
+        .execute(&mut *tx)
         .await?;
     }
 

@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS courses(
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id INTEGER NOT NULL PRIMARY KEY ,
     university VARCHAR(255) NOT NULL,
     title TEXT NOT NULL,
     english_title TEXT,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS courses(
 );
 
 CREATE TABLE IF NOT EXISTS lecturers(
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id INTEGER NOT NULL PRIMARY KEY ,
     course_id INTEGER NOT NULL,
     name TEXT NOT NULL,
     url TEXT,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS lecturers(
 );
 
 CREATE TABLE IF NOT EXISTS timetables(
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id INTEGER NOT NULL PRIMARY KEY ,
     course_id INTEGER NOT NULL,
     day INTEGER NOT NULL,
     periods INTEGER NOT NULL,
@@ -42,36 +42,35 @@ CREATE TABLE IF NOT EXISTS timetables(
 );
 
 CREATE TABLE IF NOT EXISTS semesters(
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id INTEGER NOT NULL PRIMARY KEY ,
     course_id INTEGER NOT NULL,
     semester INTEGER NOT NULL,
     FOREIGN KEY (course_id) REFERENCES courses(id)
 );
 
 CREATE TABLE IF NOT EXISTS keywords(
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id INTEGER NOT NULL PRIMARY KEY ,
     course_id INTEGER NOT NULL,
     keyword TEXT NOT NULL,
     FOREIGN KEY (course_id) REFERENCES courses(id)
 );
 
 CREATE TABLE IF NOT EXISTS competencies(
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id INTEGER NOT NULL PRIMARY KEY ,
     course_id INTEGER NOT NULL,
     competency TEXT NOT NULL,
     FOREIGN KEY (course_id) REFERENCES courses(id)
 );
 
 CREATE TABLE IF NOT EXISTS related_courses(
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id INTEGER NOT NULL PRIMARY KEY ,
     course_id INTEGER NOT NULL,
-    related_course_id INTEGER NOT NULL,
-    FOREIGN KEY (course_id) REFERENCES courses(id),
-    FOREIGN KEY (related_course_id) REFERENCES courses(id)
+    related_course_code TEXT NOT NULL,
+    FOREIGN KEY (course_id) REFERENCES courses(id)
 );
 
 CREATE TABLE IF NOT EXISTS schedules(
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id INTEGER NOT NULL PRIMARY KEY ,
     course_id INTEGER NOT NULL,
     count INTEGER NOT NULL,
     plan TEXT NOT NULL,
