@@ -232,7 +232,7 @@ fn get_title(h3: ElementRef) -> (String, String) {
     let all = h3.inner_html().trim().to_string();
 
     let titles = all.split("&nbsp;&nbsp;&nbsp;").collect::<Vec<&str>>();
-    let title = titles[0].to_string();
+    let title = titles[0].to_string().chars().skip(7).collect::<String>();
     let english_title = titles[1].to_string();
 
     (title, english_title)
