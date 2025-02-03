@@ -10,11 +10,19 @@ const emit = defineEmits<{
 const onSearchBoxSelect = (key: SearchComboBox, items: string[]) => {
   emit('clickMenuItem', key, items);
 };
+
+const onChangeSearchBox = (title: string, lecturer: string) => {
+  emit('clickMenuItem', 'title', [title]);
+  emit('clickMenuItem', 'lecturer', [lecturer]);
+};
 </script>
 
 <template>
   <div class="search-container">
-    <SearchBoxes @click-menu-item="onSearchBoxSelect" />
+    <SearchBoxes
+      @click-menu-item="onSearchBoxSelect"
+      @change-search-box="onChangeSearchBox"
+    />
     <SearchConditions />
   </div>
 </template>

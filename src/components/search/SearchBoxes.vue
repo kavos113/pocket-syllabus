@@ -3,9 +3,11 @@ import ComboBox from '../common/ComboBox.vue';
 import SearchBox from '../common/SearchBox.vue';
 import { DEPARTMENTS, UNIVERCITIES, YEARS } from '../../scripts/consts.ts';
 import { SearchComboBox } from './Search.vue';
+import { ref, watch } from 'vue';
 
 const emit = defineEmits<{
   (event: 'clickMenuItem', key: SearchComboBox, items: string[]): void;
+  (event: 'changeSearchBox', title: string, lecturer: string): void;
 }>();
 
 const onUniversitySelect = (items: string[]) => {
@@ -19,6 +21,13 @@ const onDepartmentSelect = (items: string[]) => {
 const onYearSelect = (items: string[]) => {
   emit('clickMenuItem', 'year', items);
 };
+
+const title = ref<string>('');
+const lecturer = ref<string>('');
+
+watch([title, lecturer], () => {
+  emit('changeSearchBox', title.value, lecturer.value);
+});
 </script>
 
 <template>
@@ -35,8 +44,14 @@ const onYearSelect = (items: string[]) => {
       :items="YEARS"
       @select-item="onYearSelect"
     />
-    <SearchBox />
-    <SearchBox />
+    <SearchBox
+      v-model="title"
+      placeholder="講義名"
+    />
+    <SearchBox
+      v-model="lecturer"
+      placeholder="教員名"
+    />
   </div>
 </template>
 

@@ -1,12 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+const props = defineProps<{
+  placeholder: string;
+}>();
 
-const text = ref<string>('Hello, Vue 3!');
+const textModel = defineModel<string>();
 </script>
 
 <template>
   <div class="search-box-container">
-    <p class="text">{{ text }}</p>
+    <input
+      class="text"
+      type="text"
+      v-model="textModel"
+      :placeholder="props.placeholder"
+    />
   </div>
 </template>
 
@@ -33,5 +40,10 @@ const text = ref<string>('Hello, Vue 3!');
   line-height: normal;
   margin: 0;
   padding-left: 12px;
+  border: none;
+}
+
+.text:focus {
+  outline: none;
 }
 </style>
