@@ -15,6 +15,13 @@ const onChangeSearchBox = (title: string, lecturer: string) => {
   emit('clickMenuItem', 'title', [title]);
   emit('clickMenuItem', 'lecturer', [lecturer]);
 };
+
+const onChangeSearchConditions = (
+  type: SearchConditionsType,
+  items: string[],
+) => {
+  emit('clickMenuItem', type, items);
+};
 </script>
 
 <template>
@@ -23,7 +30,7 @@ const onChangeSearchBox = (title: string, lecturer: string) => {
       @click-menu-item="onSearchBoxSelect"
       @change-search-box="onChangeSearchBox"
     />
-    <SearchConditions />
+    <SearchConditions @check-item="onChangeSearchConditions" />
   </div>
 </template>
 

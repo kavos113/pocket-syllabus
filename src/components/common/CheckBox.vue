@@ -1,10 +1,24 @@
 <script setup lang="ts">
-import { defineProps } from 'vue';
+import { defineProps, ref } from 'vue';
 
 const props = defineProps<{
   checkboxId: string;
   content: string;
 }>();
+
+const emits = defineEmits<{
+  (event: 'checkItem', index: number, value: boolean): void;
+}>();
+
+const checked = ref<boolean>(false);
+
+const onCheck = (value: boolean) => {
+  emits(
+    'checkItem',
+    parseInt(props.checkboxId[props.checkboxId.length - 1]),
+    value,
+  );
+};
 </script>
 <template>
   <div class="check-box-container">
@@ -12,6 +26,8 @@ const props = defineProps<{
       type="checkbox"
       :id="props.checkboxId"
       class="check-box"
+      v-model="checked"
+      @change="onCheck(checked)"
     />
     <label
       :for="props.checkboxId"
