@@ -5,6 +5,10 @@ const props = defineProps<{
   items: object;
 }>();
 
+const emits = defineEmits<{
+  (event: 'clickMenuItem', key: string): void;
+}>();
+
 const isObject = (value: any) => {
   return value && typeof value === 'object' && value.constructor === Object;
 };
@@ -14,6 +18,7 @@ const isArray = (value: any) => {
 };
 
 const openItems = ref<Record<string, boolean>>({});
+const selectItems = ref<Record<string, boolean>>({});
 
 const openSubMenu = (key: string) => {
   openItems.value[key] = true;
@@ -26,6 +31,11 @@ const closeSubMenu = (key: string) => {
 const isOpen = (key: string) => {
   return openItems.value[key];
 };
+
+const clickMenuItem = (key: string) => {
+  emits('clickMenuItem', key);
+  selectItems.value[key] = !selectItems.value[key];
+};
 </script>
 
 <template>
@@ -37,19 +47,25 @@ const isOpen = (key: string) => {
       @mouseenter="openSubMenu(key)"
       @mouseleave="closeSubMenu(key)"
     >
-      <div class="menuTitle">
+      <div
+        class="menuTitle"
+        :class="{ check: selectItems[key], notCheck: !selectItems[key] }"
+        @click="clickMenuItem(key)"
+      >
         <span class="menuText">{{ key }}</span>
+        {{ selectItems[key] ? '✓' : '' }}
         <span
           v-if="isObject(items)"
           class="arrow"
           >▶</span
         >
       </div>
-      <template v-if="isOpen(key)">
+      <template :class="[isOpen(key) ? 'open' : 'close']">
         <ComboBoxMenu
           :items="item"
           v-if="isObject(item)"
           class="subMenu"
+          @click-menu-item="clickMenuItem"
         />
         <ul
           v-else-if="isArray(item)"
@@ -59,8 +75,14 @@ const isOpen = (key: string) => {
             v-for="subItem in item"
             :key="subItem"
             class="menuItem"
+            :class="{
+              check: selectItems[subItem as string],
+              notCheck: !selectItems[subItem as string],
+            }"
+            @click="clickMenuItem(subItem as string)"
           >
             <span class="menuText">{{ subItem }}</span>
+            {{ selectItems[subItem as string] ? '✓' : '' }}
           </li>
         </ul>
       </template>
@@ -111,12 +133,28 @@ const isOpen = (key: string) => {
   right: 10px;
 }
 
-.menuText {
+.check {
+  font-weight: bold;
+  color: var(--stmain);
+}
+
+.notCheck {
+  font-weight: 400;
   color: var(--allblack, #000);
+}
+
+.menuText {
   font-family: 'Rounded Mplus 1c Medium', var(--font), sans-serif;
   font-size: 14px;
   font-style: normal;
-  font-weight: 400;
   line-height: normal;
+}
+
+.close {
+  display: none;
+}
+
+.open {
+  display: block;
 }
 </style>

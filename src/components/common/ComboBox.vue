@@ -1,15 +1,40 @@
 <script setup lang="ts">
 import ComboBoxMenu from './ComboBoxMenu.vue';
+import { ref } from 'vue';
 
 const props = defineProps<{
   items: object;
 }>();
+
+const emits = defineEmits<{
+  (event: 'selectItem', items: string[]): void;
+}>();
+
+const items = ref<string[]>([]);
+
+const selectItem = (key: string) => {
+  let flag = false;
+  items.value.forEach((item) => {
+    if (item === key) {
+      items.value = items.value.filter((value) => value !== key);
+      flag = true;
+    }
+  });
+  if (!flag) {
+    items.value.push(key);
+  }
+  console.log(items.value);
+  emits('selectItem', items.value);
+};
 </script>
 
 <template>
   <div class="combobox-box-container">
     <div class="comboMenu">
-      <ComboBoxMenu :items="props.items" />
+      <ComboBoxMenu
+        :items="props.items"
+        @click-menu-item="selectItem"
+      />
     </div>
   </div>
 </template>
