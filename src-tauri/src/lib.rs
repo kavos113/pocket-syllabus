@@ -119,7 +119,7 @@ async fn fetch(
                 now, length, course.title.title
             );
 
-            if course.title.url.is_empty() {
+            if course.code.is_empty() {
                 continue;
             }
 
