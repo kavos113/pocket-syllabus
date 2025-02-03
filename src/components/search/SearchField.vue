@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import SearchBoxes from './SearchBoxes.vue';
 import SearchConditions from './SearchConditions.vue';
-import { SearchComboBox, SearchConditionsType } from './Search.vue';
+import {
+  SearchComboBox,
+  SearchConditionsType,
+  SearchTimetableQuery,
+} from './Search.vue';
 
 const emit = defineEmits<{
   (event: 'clickMenuItem', key: SearchConditionsType, items: string[]): void;
+  (event: 'timetable', items: SearchTimetableQuery[]): void;
 }>();
 
 const onSearchBoxSelect = (key: SearchComboBox, items: string[]) => {
@@ -22,6 +27,10 @@ const onChangeSearchConditions = (
 ) => {
   emit('clickMenuItem', type, items);
 };
+
+const onTimeTable = (items: SearchTimetableQuery[]) => {
+  emit('clickMenuItem', 'timetable', items);
+};
 </script>
 
 <template>
@@ -30,7 +39,10 @@ const onChangeSearchConditions = (
       @click-menu-item="onSearchBoxSelect"
       @change-search-box="onChangeSearchBox"
     />
-    <SearchConditions @check-item="onChangeSearchConditions" />
+    <SearchConditions
+      @check-item="onChangeSearchConditions"
+      @timetable="onTimeTable"
+    />
   </div>
 </template>
 

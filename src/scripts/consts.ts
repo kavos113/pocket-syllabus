@@ -1,5 +1,7 @@
-export const DAYS = ['月', '火', '水', '木', '金'];
-export const PERIODS = ['1', '2', '3', '4', '5'];
+export type Day = '月' | '火' | '水' | '木' | '金';
+export type Period = '1' | '2' | '3' | '4' | '5';
+export const DAYS: Day[] = ['月', '火', '水', '木', '金'];
+export const PERIODS: Period[] = ['1', '2', '3', '4', '5'];
 export const GRADES = [
   '学士1年',
   '学士2年',

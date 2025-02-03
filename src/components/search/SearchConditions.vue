@@ -2,10 +2,11 @@
 import CheckBoxes from './CheckBoxes.vue';
 import Timetable from './Timetable.vue';
 import { GRADES, QUATERS } from '../../scripts/consts.ts';
-import { SearchCheckBox } from './Search.vue';
+import { SearchCheckBox, SearchTimetableQuery } from './Search.vue';
 
 const emits = defineEmits<{
   (event: 'checkItem', type: SearchCheckBox, item: string[]): void;
+  (event: 'timetable', items: SearchTimetableQuery[]): void;
 }>();
 
 const onCheckGrade = (items: string[]) => {
@@ -13,7 +14,11 @@ const onCheckGrade = (items: string[]) => {
 };
 
 const onCheckQuater = (items: string[]) => {
-  emits('checkItem', 'quater', items);
+  emits('checkItem', 'quarter', items);
+};
+
+const onCheckTimetable = (items: SearchTimetableQuery[]) => {
+  emits('timetable', items);
 };
 </script>
 
@@ -29,7 +34,7 @@ const onCheckQuater = (items: string[]) => {
       :contents="QUATERS"
       @check-item="onCheckQuater"
     />
-    <Timetable />
+    <Timetable @check-item="onCheckTimetable" />
   </div>
 </template>
 

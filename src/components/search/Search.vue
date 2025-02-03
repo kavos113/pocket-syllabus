@@ -3,25 +3,32 @@ import FetchButton from './FetchButton.vue';
 import SearchField from './SearchField.vue';
 import { ref } from 'vue';
 import SimpleButton from '../common/SimpleButton.vue';
+import { Day, Period } from '../../scripts/consts.ts';
 
 export type SearchComboBox = 'university' | 'department' | 'year';
 export type SearchSearchBox = 'title' | 'lecturer';
-export type SearchCheckBox = 'grade' | 'quater';
+export type SearchCheckBox = 'grade' | 'quarter';
 export type SearchTimetable = 'timetable';
 export type SearchConditionsType =
   | SearchComboBox
   | SearchSearchBox
   | SearchCheckBox
   | SearchTimetable;
+export type SearchTimetableQuery = {
+  day: Day;
+  period: Period;
+};
 
-const condition = ref<Record<SearchConditionsType, string[]>>({
+const condition = ref<
+  Record<SearchConditionsType, string[] | SearchTimetableQuery[]>
+>({
   university: [],
   department: [],
   year: [],
   title: [],
   lecturer: [],
   grade: [],
-  quater: [],
+  quarter: [],
   timetable: [],
 });
 
@@ -30,7 +37,28 @@ const onSearchConditionChange = (
   items: string[],
 ) => {
   condition.value[key] = items;
-  text.value = `university: ${condition.value.university}\ndepartment: ${condition.value.department}\nyear: ${condition.value.year}\ntitle: ${condition.value.title}\nlecturer: ${condition.value.lecturer}\ngrade: ${condition.value.grade}\nquater: ${condition.value.quater}\ntimetable: ${condition.value.timetable}`;
+  text.value = `
+  university: ${condition.value.university}\n
+  department: ${condition.value.department}\n
+  year: ${condition.value.year}\n
+  title: ${condition.value.title}\n
+  lecturer: ${condition.value.lecturer}\n
+  grade: ${condition.value.grade}\n
+  quarter: ${condition.value.quarter}\n
+  timetable: ${JSON.stringify(condition.value.timetable)}`;
+};
+
+const onTimeTable = (items: SearchTimetableQuery[]) => {
+  condition.value.timetable = items;
+  text.value = `
+  university: ${condition.value.university}\n
+  department: ${condition.value.department}\n
+  year: ${condition.value.year}\n
+  title: ${condition.value.title}\n
+  lecturer: ${condition.value.lecturer}\n
+  grade: ${condition.value.grade}\n
+  quarter: ${condition.value.quarter}\n
+  timetable: ${JSON.stringify(condition.value.timetable)}`;
 };
 
 const text = ref<string>('Total: ');
@@ -39,7 +67,10 @@ const text = ref<string>('Total: ');
 <template>
   <div class="search-wrapper">
     <FetchButton />
-    <SearchField @click-menu-item="onSearchConditionChange" />
+    <SearchField
+      @click-menu-item="onSearchConditionChange"
+      @timetable="onTimeTable"
+    />
     <div>
       <SimpleButton text="Search" />
       <p>{{ text }}</p>
