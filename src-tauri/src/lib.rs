@@ -73,71 +73,89 @@ async fn fetch(
 
     (*app).emit("fetch_status", "Start Fetching").unwrap();
 
-    let url =
-        "https://www.ocw.titech.ac.jp/index.php?module=General&action=T0100&GakubuCD=1&lang=JA";
-    let rc = reqwest::get(url).await.unwrap();
-    let res = rc.text().await.unwrap();
-    tokio::time::sleep(time::Duration::from_secs(10)).await;
+    let urls = vec![
+        "https://www.ocw.titech.ac.jp/index.php?module=General&action=T0100&GakubuCD=1&lang=JA", //理学院
+        "https://www.ocw.titech.ac.jp/index.php?module=General&action=T0100&GakubuCD=4&lang=JA", // 情報
+        "https://www.ocw.titech.ac.jp/index.php?module=General&action=T0100&GakubuCD=2&lang=JA", //工学院
+        "https://www.ocw.titech.ac.jp/index.php?module=General&action=T0100&GakubuCD=3&lang=JA", // 物質
+        "https://www.ocw.titech.ac.jp/index.php?module=General&action=T0100&GakubuCD=5&lang=JA", // 生命
+        "https://www.ocw.titech.ac.jp/index.php?module=General&action=T0100&GakubuCD=6&lang=JA", // 環社
+        "https://www.ocw.titech.ac.jp/index.php?module=General&action=T0100&GakubuCD=10&lang=JA", // 初年専門
+        "https://www.ocw.titech.ac.jp/index.php?module=General&action=T0100&GakubuCD=11&lang=JA", // 共通
+        "https://www.ocw.titech.ac.jp/index.php?module=General&action=T0100&GakubuCD=7&lang=JA", // 教養
+    ];
 
-    let courses = html_to_course_abstracts(res.as_ref());
-
-    let length = courses.len();
-    let mut now = 0;
-
-    (*app)
-        .emit("fetch_status", format!("Left: {} courses", length))
-        .unwrap();
-
-    for course in courses {
-        now += 1;
+    for url in urls {
         (*app)
-            .emit(
-                "fetch_status",
-                format!(
-                    "Scraping: {}/{} courses: {}",
-                    now, length, course.title.title
-                ),
-            )
+            .emit("fetch_status", "Fetching Main".to_string())
             .unwrap();
-
-        println!(
-            "Scraping: {}/{} courses: {}",
-            now, length, course.title.title
-        );
-
-        let check = database::check_sylbs_update(
-            &sqlite_pool,
-            &course.code,
-            &course.title.title,
-            &course.sylbs_update,
-        )
-        .await
-        .unwrap();
-
-        if check {
-            continue;
-        }
-
-        let rc = reqwest::get(course.title.url.as_str()).await.unwrap();
-        let mut detail = html_to_course(rc.text().await.unwrap().as_ref());
-        detail.url = course.title.url;
-        detail.sylbs_update = course.sylbs_update;
+        let rc = reqwest::get(url).await.unwrap();
+        let res = rc.text().await.unwrap();
         tokio::time::sleep(time::Duration::from_secs(10)).await;
 
-        database::insert_course(&sqlite_pool, &detail)
+        let courses = html_to_course_abstracts(res.as_ref());
+
+        let length = courses.len();
+        let mut now = 0;
+
+        (*app)
+            .emit("fetch_status", format!("Left: {} courses", length))
+            .unwrap();
+
+        for course in courses {
+            now += 1;
+            (*app)
+                .emit(
+                    "fetch_status",
+                    format!(
+                        "Scraping: {}/{} courses: {} {}",
+                        now, length, course.department, course.title.title
+                    ),
+                )
+                .unwrap();
+
+            println!(
+                "Scraping: {}/{} courses: {}",
+                now, length, course.title.title
+            );
+
+            if course.title.url.is_empty() {
+                continue;
+            }
+
+            let check = database::check_sylbs_update(
+                &sqlite_pool,
+                &course.code,
+                &course.title.title,
+                &course.sylbs_update,
+            )
             .await
             .unwrap();
 
-        (*app)
-            .emit(
-                "fetch_status",
-                format!("Finished: {}/{} courses: {}", now, length, detail.title),
-            )
-            .unwrap();
+            if check {
+                continue;
+            }
+
+            let rc = reqwest::get(course.title.url.as_str()).await.unwrap();
+            let mut detail = html_to_course(rc.text().await.unwrap().as_ref());
+            detail.url = course.title.url;
+            detail.sylbs_update = course.sylbs_update;
+            tokio::time::sleep(time::Duration::from_secs(10)).await;
+
+            database::insert_course(&sqlite_pool, &detail)
+                .await
+                .unwrap();
+
+            (*app)
+                .emit(
+                    "fetch_status",
+                    format!("Finished: {}/{} courses: {}", now, length, detail.title),
+                )
+                .unwrap();
+        }
+
+        (*app).emit("fetch_status", "finish insert").unwrap();
     }
-
-    (*app).emit("fetch_status", "finish insert").unwrap();
-
     Ok(())
 }
 

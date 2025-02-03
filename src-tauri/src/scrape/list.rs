@@ -6,7 +6,7 @@ pub struct CourseAbstract {
     pub code: String,
     pub title: CourseTitle,
     lecturer: Vec<Lecturer>,
-    department: String,
+    pub department: String,
     start: String,
     pub sylbs_update: String,
 }
