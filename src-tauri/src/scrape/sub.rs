@@ -558,84 +558,132 @@ fn get_details(overview: ElementRef) -> CourseDetail {
     let tbody_selector = Selector::parse("tbody").unwrap();
     let h3_selector = Selector::parse("h3").unwrap();
 
-    details.abst = match divs.next() {
-        Some(div) => get_abstract(div.select(&p_selector).next().unwrap()),
-        None => "".to_string(),
-    };
+    for div in divs {
+        let h3 = match div.select(&h3_selector).next() {
+            Some(h3) => h3,
+            None => {
+                continue;
+            }
+        };
 
-    details.goal = match divs.next() {
-        Some(div) => get_goal(div.select(&p_selector).next().unwrap()),
-        None => "".to_string(),
-    };
-
-    details.keyword = match divs.next() {
-        Some(div) => get_keywords(div.select(&p_selector).next().unwrap()),
-        None => Vec::new(),
-    };
-
-    details.competencies = match divs.next() {
-        Some(div) => get_competencies(div),
-        None => Vec::new(),
-    };
-
-    details.flow = match divs.next() {
-        Some(div) => {
-            let h3 = div.select(&h3_selector).next().unwrap();
-            println!("{:?}", h3.inner_html());
-            get_flow(div.select(&p_selector).next().unwrap())
+        if h3.inner_html().trim() == "講義の概要とねらい" {
+            details.abst = match div.select(&p_selector).next() {
+                Some(p) => get_abstract(p),
+                None => "".to_string(),
+            };
+            continue;
         }
-        None => "".to_string(),
-    };
 
-    details.schedule = match divs.next() {
-        Some(div) => get_schedule(div.select(&tbody_selector).next().unwrap()),
-        None => Vec::new(),
-    };
+        if h3.inner_html().trim() == "到達目標" {
+            details.goal = match div.select(&p_selector).next() {
+                Some(p) => get_goal(p),
+                None => "".to_string(),
+            };
+            continue;
+        }
 
-    details.out_of_class = match divs.next() {
-        Some(div) => get_out_of_class(div.select(&p_selector).next().unwrap()),
-        None => "".to_string(),
-    };
+        if h3.inner_html().trim() == "キーワード" {
+            details.keyword = match div.select(&p_selector).next() {
+                Some(p) => get_keywords(p),
+                None => Vec::new(),
+            };
+            continue;
+        }
 
-    details.textbook = match divs.next() {
-        Some(div) => get_textbook(div.select(&p_selector).next().unwrap()),
-        None => "".to_string(),
-    };
+        if h3.inner_html().trim() == "学生が身につける力(ディグリー・ポリシー)" {
+            details.competencies = get_competencies(div);
+            continue;
+        }
 
-    details.reference_book = match divs.next() {
-        Some(div) => get_reference_book(div.select(&p_selector).next().unwrap()),
-        None => "".to_string(),
-    };
+        if h3.inner_html().trim() == "授業の進め方" {
+            details.flow = match div.select(&p_selector).next() {
+                Some(p) => get_flow(p),
+                None => "".to_string(),
+            };
+            continue;
+        }
 
-    details.assessment = match divs.next() {
-        Some(div) => get_assessment(div.select(&p_selector).next().unwrap()),
-        None => "".to_string(),
-    };
+        if h3.inner_html().trim() == "授業計画・課題" {
+            details.schedule = match div.select(&tbody_selector).next() {
+                Some(tbody) => get_schedule(tbody),
+                None => Vec::new(),
+            };
+            continue;
+        }
 
-    details.related_course = match divs.next() {
-        Some(div) => get_related_course(div.select(&ul_selector).next().unwrap()),
-        None => Vec::new(),
-    };
+        if h3.inner_html().trim() == "授業時間外学修（予習・復習等）" {
+            details.out_of_class = match div.select(&p_selector).next() {
+                Some(p) => get_out_of_class(p),
+                None => "".to_string(),
+            };
+            continue;
+        }
 
-    details.prerequisite = match divs.next() {
-        Some(div) => get_prerequisite(div.select(&p_selector).next().unwrap()),
-        None => "".to_string(),
-    };
+        if h3.inner_html().trim() == "教科書" {
+            details.textbook = match div.select(&p_selector).next() {
+                Some(p) => get_textbook(p),
+                None => "".to_string(),
+            };
+            continue;
+        }
 
-    details.contact = match divs.next() {
-        Some(div) => get_contact(div.select(&p_selector).next().unwrap()),
-        None => "".to_string(),
-    };
+        if h3.inner_html().trim() == "参考書、講義資料等" {
+            details.reference_book = match div.select(&p_selector).next() {
+                Some(p) => get_reference_book(p),
+                None => "".to_string(),
+            };
+            continue;
+        }
 
-    details.office_hour = match divs.next() {
-        Some(div) => get_office_hour(div.select(&p_selector).next().unwrap()),
-        None => "".to_string(),
-    };
+        if h3.inner_html().trim() == "成績評価の基準及び方法" {
+            details.assessment = match div.select(&p_selector).next() {
+                Some(p) => get_assessment(p),
+                None => "".to_string(),
+            };
+            continue;
+        }
 
-    details.note = match divs.next() {
-        Some(div) => get_note(div.select(&p_selector).next().unwrap()),
-        None => "".to_string(),
-    };
+        if h3.inner_html().trim() == "関連する科目" {
+            details.related_course = match div.select(&ul_selector).next() {
+                Some(ul) => get_related_course(ul),
+                None => Vec::new(),
+            };
+            continue;
+        }
+
+        if h3.inner_html().trim() == "履修の条件(知識・技能・履修済科目等)" {
+            details.prerequisite = match div.select(&p_selector).next() {
+                Some(p) => get_prerequisite(p),
+                None => "".to_string(),
+            };
+            continue;
+        }
+
+        if h3.inner_html().trim() == "連絡先（メール、電話番号）&nbsp;&nbsp;&nbsp;&nbsp;※”[at]”を”@”(半角)に変換してください。" {
+            details.contact = match div.select(&p_selector).next() {
+                Some(p) => get_contact(p),
+                None => "".to_string(),
+            };
+            continue;
+        }
+
+        if h3.inner_html().trim() == "オフィスアワー" {
+            details.office_hour = match div.select(&p_selector).next() {
+                Some(p) => get_office_hour(p),
+                None => "".to_string(),
+            };
+            continue;
+        }
+
+        if h3.inner_html().trim() == "その他" {
+            details.note = match div.select(&p_selector).next() {
+                Some(p) => get_note(p),
+                None => "".to_string(),
+            };
+            continue;
+        }
+    }
+
     details
 }
 

@@ -65,16 +65,19 @@ fn fetch_test(sqlite_pool: State<'_, SqlitePool>, app: State<'_, tauri::AppHandl
 }
 
 #[tauri::command]
-fn fetch(sqlite_pool: State<'_, SqlitePool>, app: State<'_, tauri::AppHandle>) {
+async fn fetch(
+    sqlite_pool: State<'_, SqlitePool>,
+    app: State<'_, tauri::AppHandle>,
+) -> Result<(), ()> {
     println!("fetch");
 
     (*app).emit("fetch_status", "Start Fetching").unwrap();
 
     let url =
         "https://www.ocw.titech.ac.jp/index.php?module=General&action=T0100&GakubuCD=1&lang=JA";
-    let rc = reqwest::blocking::get(url).unwrap();
-    let res = rc.text().unwrap();
-    thread::sleep(time::Duration::from_secs(10));
+    let rc = reqwest::get(url).await.unwrap();
+    let res = rc.text().await.unwrap();
+    tokio::time::sleep(time::Duration::from_secs(10)).await;
 
     let courses = html_to_course_abstracts(res.as_ref());
 
@@ -86,43 +89,44 @@ fn fetch(sqlite_pool: State<'_, SqlitePool>, app: State<'_, tauri::AppHandle>) {
         .unwrap();
 
     for course in courses {
-        let check = block_on(database::check_sylbs_update(
+        now += 1;
+        (*app)
+            .emit(
+                "fetch_status",
+                format!(
+                    "Scraping: {}/{} courses: {}",
+                    now, length, course.title.title
+                ),
+            )
+            .unwrap();
+
+        println!(
+            "Scraping: {}/{} courses: {}",
+            now, length, course.title.title
+        );
+
+        let check = database::check_sylbs_update(
             &sqlite_pool,
             &course.code,
             &course.title.title,
             &course.sylbs_update,
-        ))
+        )
+        .await
         .unwrap();
 
         if check {
-            now += 1;
-            (*app)
-                .emit(
-                    "fetch_status",
-                    format!(
-                        "Finished: {}/{} courses: {}",
-                        now, length, course.title.title
-                    ),
-                )
-                .unwrap();
             continue;
         }
 
-        let rc = reqwest::blocking::get(course.title.url.as_str()).unwrap();
-        let mut detail = html_to_course(rc.text().unwrap().as_ref());
+        let rc = reqwest::get(course.title.url.as_str()).await.unwrap();
+        let mut detail = html_to_course(rc.text().await.unwrap().as_ref());
         detail.url = course.title.url;
         detail.sylbs_update = course.sylbs_update;
-        (*app)
-            .emit(
-                "fetch_status",
-                format!("Scraping: {}/{} courses: {}", now, length, detail.title),
-            )
+        tokio::time::sleep(time::Duration::from_secs(10)).await;
+
+        database::insert_course(&sqlite_pool, &detail)
+            .await
             .unwrap();
-        thread::sleep(time::Duration::from_secs(10));
-
-        block_on(database::insert_course(&sqlite_pool, &detail)).unwrap();
-
-        now += 1;
 
         (*app)
             .emit(
@@ -133,6 +137,8 @@ fn fetch(sqlite_pool: State<'_, SqlitePool>, app: State<'_, tauri::AppHandle>) {
     }
 
     (*app).emit("fetch_status", "finish insert").unwrap();
+
+    Ok(())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -142,7 +148,7 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet, fetch_test])
+        .invoke_handler(tauri::generate_handler![greet, fetch_test, fetch])
         .setup(|app| {
             app.manage(sqlite_pool);
             app.manage(app.app_handle().clone());

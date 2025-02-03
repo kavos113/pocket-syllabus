@@ -11,7 +11,9 @@ async function greeting() {
 
 async function fetch() {
   console.log('Fetching...');
-  await invoke('fetch');
+  invoke('fetch').then(() => {
+    console.log('Fetched');
+  });
 }
 
 const fetchStatus = ref('Not fetched');
