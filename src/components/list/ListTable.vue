@@ -10,6 +10,14 @@ const props = defineProps<{
   items: CourseListItem[];
 }>();
 
+const emits = defineEmits<{
+  (event: 'sort', key: string): void;
+}>();
+
+const onSort = (key: string) => {
+  emits('sort', key);
+};
+
 const detailsData = ref<Course>({
   id: 0,
   university: '',
@@ -52,7 +60,6 @@ const isOverlayActive = ref<boolean>(false);
 const onListItemClick = async (id: number) => {
   await invoke('get_course', { id }).then((data) => {
     detailsData.value = data as Course;
-    console.dir(data);
   });
   isDetailOpen.value = true;
   isOverlayActive.value = true;
@@ -67,7 +74,7 @@ const closeDetail = async () => {
 
 <template>
   <div class="table">
-    <ListHeaderItem />
+    <ListHeaderItem @sort="onSort" />
     <div
       v-for="item in props.items"
       :key="item.id"

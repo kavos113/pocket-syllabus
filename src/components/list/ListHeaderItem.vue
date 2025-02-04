@@ -1,26 +1,49 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const emits = defineEmits<{
+  (event: 'sort', key: string): void;
+}>();
+
+const onSort = (key: string) => {
+  emits('sort', key);
+};
+</script>
 
 <template>
   <div class="item-wrapper">
     <div class="item university">
       <p class="text">大学名</p>
     </div>
-    <div class="item code">
+    <div
+      class="item code"
+      @click="onSort('code')"
+    >
       <p class="text">コード</p>
     </div>
-    <div class="item name">
+    <div
+      class="item name"
+      @click="onSort('title')"
+    >
       <p class="text">講義名</p>
     </div>
-    <div class="item lecturer">
+    <div
+      class="item lecturer"
+      @click="onSort('lecturer')"
+    >
       <p class="text">担当</p>
     </div>
-    <div class="item timetable">
+    <div
+      class="item timetable"
+      @click="onSort('timetable')"
+    >
       <p class="text">時間割</p>
     </div>
     <div class="item semester">
       <p class="text">開講時期</p>
     </div>
-    <div class="item department">
+    <div
+      class="item department"
+      @click="onSort('department')"
+    >
       <p class="text">開講元</p>
     </div>
     <div class="item credit">
@@ -62,21 +85,25 @@
 .code {
   grid-column: 3 / 5;
   grid-row: 1 / 2;
+  cursor: pointer;
 }
 
 .name {
   grid-column: 5 / 12;
   grid-row: 1 / 2;
+  cursor: pointer;
 }
 
 .lecturer {
   grid-column: 12 / 15;
   grid-row: 1 / 2;
+  cursor: pointer;
 }
 
 .timetable {
   grid-column: 15 / 18;
   grid-row: 1 / 2;
+  cursor: pointer;
 }
 
 .semester {
@@ -87,6 +114,7 @@
 .department {
   grid-column: 20 / 23;
   grid-row: 1 / 2;
+  cursor: pointer;
 }
 
 .credit {
