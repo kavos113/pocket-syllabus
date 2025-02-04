@@ -76,28 +76,16 @@ const onSearchConditionChange = (
   items: string[],
 ) => {
   condition.value[key] = items;
-  text.value = `
-  university: ${condition.value.university}\n
-  department: ${condition.value.department}\n
-  year: ${condition.value.year}\n
-  title: ${condition.value.title}\n
-  lecturer: ${condition.value.lecturer}\n
-  grade: ${condition.value.grade}\n
-  quarter: ${condition.value.quarter}\n
-  timetable: ${JSON.stringify(condition.value.timetable)}`;
+  university.value = condition.value.university;
+  department.value = condition.value.department;
+  year.value = condition.value.year;
 };
 
 const onTimeTable = (items: SearchTimetableQuery[]) => {
   condition.value.timetable = items;
-  text.value = `
-  university: ${condition.value.university}\n
-  department: ${condition.value.department}\n
-  year: ${condition.value.year}\n
-  title: ${condition.value.title}\n
-  lecturer: ${condition.value.lecturer}\n
-  grade: ${condition.value.grade}\n
-  quarter: ${condition.value.quarter}\n
-  timetable: ${JSON.stringify(condition.value.timetable)}`;
+  university.value = condition.value.university;
+  department.value = condition.value.department;
+  year.value = condition.value.year;
 };
 
 const onSearch = async () => {
@@ -152,7 +140,9 @@ const onSearch = async () => {
   });
 };
 
-const text = ref<string>('Total: ');
+const department = ref<string[]>([]);
+const university = ref<string[]>([]);
+const year = ref<string[]>([]);
 </script>
 
 <template>
@@ -166,8 +156,11 @@ const text = ref<string>('Total: ');
       <SimpleButton
         text="Search"
         @click="onSearch"
+        class="button"
       />
-      <p>{{ text }}</p>
+      <p>大学: {{ university.join(', ') }}</p>
+      <p>開講: {{ department.join(', ') }}</p>
+      <p>年度: {{ year.join(', ') }}</p>
     </div>
   </div>
 </template>
@@ -179,5 +172,9 @@ const text = ref<string>('Total: ');
   align-items: flex-start;
   gap: 77px;
   flex-shrink: 0;
+}
+
+.button {
+  width: 110px;
 }
 </style>

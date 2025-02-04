@@ -37,7 +37,9 @@ const props = defineProps<{
 
 <style scoped>
 .item {
-  border: 1px solid var(--ablack);
+  border-bottom: 1px solid var(--ablack);
+  border-right: 1px solid var(--ablack);
+  border-left: 1px solid var(--ablack);
   height: 18px;
   display: flex;
   align-items: center;

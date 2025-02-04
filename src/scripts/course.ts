@@ -14,6 +14,7 @@ export interface Course {
   language: string;
   courseDetail: CourseDetail;
   url: string;
+  sylbs_update: string;
 }
 
 export interface Lecturer {
@@ -42,7 +43,6 @@ export interface CourseDetail {
   referenceBook: string;
   assessment: string;
   relatedCourse: string[];
-  relatedCourses: string;
   prerequisite: string;
   contact: string;
   officeHour: string;

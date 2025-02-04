@@ -630,6 +630,7 @@ pub struct CourseResponse {
     language: String,
     course_detail: CourseDetailResponse,
     url: String,
+    sylbs_update: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -703,6 +704,7 @@ struct CourseRow {
     contact: String,
     office_hour: String,
     note: String,
+    sylbs_update: String,
 }
 
 #[derive(FromRow)]
@@ -855,5 +857,6 @@ pub async fn get_course(pool: &SqlitePool, id: i32) -> CourseResponse {
             note: course.note,
         },
         url: course.url,
+        sylbs_update: course.sylbs_update,
     }
 }
