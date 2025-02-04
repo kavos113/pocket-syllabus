@@ -21,7 +21,7 @@ const props = defineProps<{
       <p class="text">{{ props.item.lecturer }}</p>
     </div>
     <div class="item timetable">
-      <p class="text">{{ props.item.timeTable }}</p>
+      <p class="text">{{ props.item.timetable }}</p>
     </div>
     <div class="item semester">
       <p class="text">{{ props.item.semester }}</p>
@@ -41,6 +41,7 @@ const props = defineProps<{
   height: 18px;
   display: flex;
   align-items: center;
+  overflow: hidden;
 }
 
 .text {

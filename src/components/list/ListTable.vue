@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { CourseListItem, getSampleItems } from '../../scripts/course.ts';
+import { CourseListItem } from '../../scripts/course.ts';
 import ListHeaderItem from './ListHeaderItem.vue';
 import ListItem from './ListItem.vue';
 
-const items = ref<CourseListItem[]>(getSampleItems(100));
+const props = defineProps<{
+  items: CourseListItem[];
+}>();
 </script>
 
 <template>
   <div class="table">
     <ListHeaderItem />
     <div
-      v-for="item in items"
+      v-for="item in props.items"
       :key="item.id"
     >
       <ListItem :item="item" />

@@ -13,6 +13,7 @@ import {
   toPeriodQuery,
 } from '../../scripts/consts.ts';
 import { invoke } from '@tauri-apps/api/core';
+import { CourseListItem } from '../../scripts/course.ts';
 
 export type SearchComboBox = 'university' | 'department' | 'year';
 export type SearchSearchBox = 'title' | 'lecturer';
@@ -54,6 +55,10 @@ interface SearchForQuery {
   quarter: SemesterQuery[];
   timetable: SearchTimetableForQuery[];
 }
+
+const emits = defineEmits<{
+  (event: 'search', results: CourseListItem[]): void;
+}>();
 
 const condition = ref<SearchQuery>({
   university: [],
@@ -143,7 +148,7 @@ const onSearch = async () => {
   });
 
   invoke('search_courses', { searchQuery: searchForQuery }).then((results) => {
-    console.dir(results);
+    emits('search', results as CourseListItem[]);
   });
 };
 

@@ -52,7 +52,7 @@ export interface CourseListItem {
   code: string;
   title: string;
   lecturer: string;
-  timeTable: string;
+  timetable: string;
   semester: string;
   department: string;
   credit: number;
@@ -67,7 +67,7 @@ export const getSampleItems = (numSamples: number): CourseListItem[] => {
       code: `000${i}`,
       title: `コース${i}`,
       lecturer: `講師${i}`,
-      timeTable: `月${i}, 木${i}`,
+      timetable: `月${i}, 木${i}`,
       semester: '2024前期',
       department: `学科${i}`,
       credit: 2,

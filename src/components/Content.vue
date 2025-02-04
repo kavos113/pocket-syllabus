@@ -1,12 +1,27 @@
 <script setup lang="ts">
 import ListTable from './list/ListTable.vue';
 import Search from './search/Search.vue';
+import { ref } from 'vue';
+import { CourseListItem } from '../scripts/course.ts';
+
+const listItems = ref<CourseListItem[]>([]);
+
+const onSearch = (results: CourseListItem[]) => {
+  listItems.value = results;
+  console.dir(results);
+};
 </script>
 
 <template>
   <div class="content-container">
-    <Search class="search" />
-    <ListTable class="table" />
+    <Search
+      class="search"
+      @search="onSearch"
+    />
+    <ListTable
+      class="table"
+      :items="listItems"
+    />
   </div>
 </template>
 
