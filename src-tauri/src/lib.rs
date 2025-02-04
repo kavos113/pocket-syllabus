@@ -1,6 +1,6 @@
 use crate::scrape::{html_to_course, html_to_course_abstracts};
 use sqlx::SqlitePool;
-use std::{thread, time};
+use std::time;
 use tauri::async_runtime::block_on;
 use tauri::{Emitter, Manager, State};
 
@@ -8,6 +8,7 @@ mod database;
 mod sample;
 mod scrape;
 
+use crate::database::{CourseListItem, SearchQuery};
 pub use scrape::Course;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -29,7 +30,7 @@ fn fetch_test(sqlite_pool: State<'_, SqlitePool>, app: State<'_, tauri::AppHandl
 
     // let res = sample::get_sample_main();
 
-    let courses = html_to_course_abstracts((&res).as_ref());
+    let courses = html_to_course_abstracts(res.as_ref());
 
     println!("{:?}", courses.len());
     println!("{:?}", courses[1]);
@@ -59,7 +60,7 @@ fn fetch_test(sqlite_pool: State<'_, SqlitePool>, app: State<'_, tauri::AppHandl
 
     (*app).emit("fetch_status", "finish scrape").unwrap();
 
-    block_on(database::insert_course(&*sqlite_pool, &detail)).unwrap();
+    block_on(database::insert_course(&sqlite_pool, &detail)).unwrap();
 
     (*app).emit("fetch_status", "finish insert").unwrap();
 }
@@ -159,6 +160,16 @@ async fn fetch(
     Ok(())
 }
 
+#[tauri::command]
+async fn search_courses(
+    sqlite_pool: State<'_, SqlitePool>,
+    search_query: SearchQuery,
+) -> Result<Vec<CourseListItem>, ()> {
+    let courses = database::search_courses(&*sqlite_pool, search_query).await;
+
+    Ok(courses)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let sqlite_pool = block_on(database::create_sqlite_pool("./database.db")).unwrap();
@@ -166,7 +177,12 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![greet, fetch_test, fetch])
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            fetch_test,
+            fetch,
+            search_courses
+        ])
         .setup(|app| {
             app.manage(sqlite_pool);
             app.manage(app.app_handle().clone());

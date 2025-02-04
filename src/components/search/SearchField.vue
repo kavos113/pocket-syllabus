@@ -29,7 +29,7 @@ const onChangeSearchConditions = (
 };
 
 const onTimeTable = (items: SearchTimetableQuery[]) => {
-  emit('clickMenuItem', 'timetable', items);
+  emit('timetable', items);
 };
 </script>
 

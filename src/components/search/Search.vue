@@ -4,24 +4,32 @@ import SearchField from './SearchField.vue';
 import { ref } from 'vue';
 import SimpleButton from '../common/SimpleButton.vue';
 import { Day, Period } from '../../scripts/consts.ts';
+import { invoke } from '@tauri-apps/api/core';
 
 export type SearchComboBox = 'university' | 'department' | 'year';
 export type SearchSearchBox = 'title' | 'lecturer';
 export type SearchCheckBox = 'grade' | 'quarter';
-export type SearchTimetable = 'timetable';
 export type SearchConditionsType =
   | SearchComboBox
   | SearchSearchBox
-  | SearchCheckBox
-  | SearchTimetable;
+  | SearchCheckBox;
 export type SearchTimetableQuery = {
   day: Day;
   period: Period;
 };
 
-const condition = ref<
-  Record<SearchConditionsType, string[] | SearchTimetableQuery[]>
->({
+interface SearchQuery {
+  university: string[];
+  department: string[];
+  year: string[];
+  title: string[];
+  lecturer: string[];
+  grade: string[];
+  quarter: string[];
+  timetable: SearchTimetableQuery[];
+}
+
+const condition = ref<SearchQuery>({
   university: [],
   department: [],
   year: [],
@@ -61,6 +69,12 @@ const onTimeTable = (items: SearchTimetableQuery[]) => {
   timetable: ${JSON.stringify(condition.value.timetable)}`;
 };
 
+const onSearch = async () => {
+  invoke('search_courses', { searchQuery: condition.value }).then(() => {
+    console.log('Searched');
+  });
+};
+
 const text = ref<string>('Total: ');
 </script>
 
@@ -72,7 +86,10 @@ const text = ref<string>('Total: ');
       @timetable="onTimeTable"
     />
     <div>
-      <SimpleButton text="Search" />
+      <SimpleButton
+        text="Search"
+        @click="onSearch"
+      />
       <p>{{ text }}</p>
     </div>
   </div>

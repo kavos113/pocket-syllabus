@@ -1,7 +1,8 @@
 use crate::scrape::{Day, Period, Semester};
 use crate::Course;
+use serde::{Deserialize, Serialize};
 use sqlx::sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteSynchronous};
-use sqlx::{Row, SqlitePool};
+use sqlx::{FromRow, Row, SqlitePool};
 use std::str::FromStr;
 
 type DbResult<T> = Result<T, Box<dyn std::error::Error>>;
@@ -243,4 +244,154 @@ pub async fn check_sylbs_update(
     tx.commit().await?;
 
     Ok(result)
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SearchQuery {
+    pub university: Vec<String>,
+    pub department: Vec<String>,
+    pub year: Vec<String>,
+    pub title: Vec<String>,
+    pub lecturer: Vec<String>,
+    pub grade: Vec<String>,
+    pub quarter: Vec<String>,
+    pub timetable: Vec<TimetableQuery>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TimetableQuery {
+    pub day: Day,
+    pub period: Period,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CourseListItem {
+    id: i32,
+    university: String,
+    code: String,
+    title: String,
+    lecturer: String,
+    timetable: String,
+    semester: String,
+    department: String,
+    credit: i32,
+}
+
+#[derive(FromRow)]
+struct CourseListItemRow {
+    id: i32,
+    university: String,
+    code: String,
+    title: String,
+    department: String,
+    credit: i32,
+    year: i32,
+}
+
+#[derive(FromRow)]
+struct TimetableRow {
+    day: i32,
+    periods: i32,
+}
+
+pub async fn search_courses(pool: &SqlitePool, search_query: SearchQuery) -> Vec<CourseListItem> {
+    let mut tx = pool.begin().await.unwrap();
+
+    let query = "SELECT id, university, code, title, department, credit, year FROM courses";
+    let mut constraints = Vec::new();
+
+    if search_query.university.len() > 0 {
+        constraints.push(format!(
+            "university IN ({})",
+            search_query
+                .university
+                .iter()
+                .map(|s| format!("'{}'", s))
+                .collect::<Vec<String>>()
+                .join(",")
+        ));
+    }
+
+    if search_query.department.len() > 0 {
+        constraints.push(format!(
+            "department IN ({})",
+            search_query
+                .department
+                .iter()
+                .map(|s| format!("'{}'", s))
+                .collect::<Vec<String>>()
+                .join(",")
+        ));
+    }
+
+    if search_query.year.len() > 0 {
+        constraints.push(format!(
+            "year IN ({})",
+            search_query
+                .year
+                .iter()
+                .map(|s| format!("'{}'", s))
+                .collect::<Vec<String>>()
+                .join(",")
+        ));
+    }
+
+    if search_query.title.len() > 0 {
+        constraints.push(format!(
+            "language IN ({})",
+            search_query
+                .title
+                .iter()
+                .map(|s| format!("'{}'", s))
+                .collect::<Vec<String>>()
+                .join(",")
+        ));
+    }
+
+    if search_query.lecturer.len() > 0 {
+        constraints.push(format!(
+            "lecturer IN ({})",
+            search_query
+                .lecturer
+                .iter()
+                .map(|s| format!("'{}'", s))
+                .collect::<Vec<String>>()
+                .join(",")
+        ));
+    }
+
+    if search_query.grade.len() > 0 {
+        constraints.push(format!(
+            "grade IN ({})",
+            search_query
+                .grade
+                .iter()
+                .map(|s| format!("'{}'", s))
+                .collect::<Vec<String>>()
+                .join(",")
+        ));
+    }
+
+    if search_query.quarter.len() > 0 {
+        constraints.push(format!(
+            "quarter IN ({})",
+            search_query
+                .quarter
+                .iter()
+                .map(|s| format!("'{}'", s))
+                .collect::<Vec<String>>()
+                .join(",")
+        ));
+    }
+
+    let query = format!(
+        "{}{}{}",
+        query,
+        if constraints.len() > 0 { "WHERE " } else { "" },
+        constraints.join(" AND ")
+    );
+
+    println!("query: {}", query);
+
+    Vec::new()
 }

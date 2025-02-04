@@ -1,6 +1,7 @@
 use crate::scrape::Lecturer;
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};
+use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::fmt::Formatter;
 
@@ -75,7 +76,7 @@ pub struct LecturePlan {
     pub assignment: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum Day {
     Monday,
     Tuesday,
@@ -86,7 +87,7 @@ pub enum Day {
     Sunday,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum Period {
     First,
     Second,
