@@ -10,7 +10,7 @@ export interface Course {
   code: string;
   credit: number;
   year: number;
-  semester: number;
+  semester: number[];
   language: string;
   courseDetail: CourseDetail;
   url: string;
@@ -30,20 +30,29 @@ export interface TimeTable {
 }
 
 export interface CourseDetail {
-  abstract: string;
+  abst: string;
   goal: string;
   experience: boolean;
   keyword: string[];
   competencies: string[];
   flow: string;
-  schedule: string;
+  schedule: LecturePlan[];
   outOfClass: string;
   textbook: string;
   referenceBook: string;
   assessment: string;
+  relatedCourse: string[];
   relatedCourses: string;
   prerequisite: string;
+  contact: string;
+  officeHour: string;
   note: string;
+}
+
+export interface LecturePlan {
+  count: number;
+  plan: string;
+  assignment: string;
 }
 
 export interface CourseListItem {

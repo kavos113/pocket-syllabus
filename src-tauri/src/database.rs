@@ -299,8 +299,8 @@ struct TimetableRow {
 
 #[derive(FromRow)]
 struct LecturerRow {
-    // id: i32,
-    // course_id: i32,
+    id: i32,
+    course_id: i32,
     name: String,
     url: String,
 }
@@ -610,4 +610,250 @@ pub async fn search_courses(pool: &SqlitePool, search_query: SearchQuery) -> Vec
     }
 
     results
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CourseResponse {
+    id: i32,
+    university: String,
+    title: String,
+    english_title: String,
+    department: String,
+    lecturer: Vec<LecturerResponse>,
+    lecture_type: String,
+    timetable: Vec<TimetableResponse>,
+    code: String,
+    credit: i32,
+    year: i32,
+    semester: Vec<i32>,
+    language: String,
+    course_detail: CourseDetailResponse,
+    url: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LecturerResponse {
+    id: i32,
+    name: String,
+    url: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TimetableResponse {
+    course_id: i32,
+    day_of_week: i32,
+    period: i32,
+    room: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CourseDetailResponse {
+    abst: String,
+    goal: String,
+    experience: bool,
+    keyword: Vec<String>,
+    competencies: Vec<String>,
+    flow: String,
+    schedule: Vec<ScheduleResponse>,
+    out_of_class: String,
+    textbook: String,
+    reference_book: String,
+    assessment: String,
+    related_course: Vec<String>,
+    prerequisite: String,
+    contact: String,
+    office_hour: String,
+    note: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ScheduleResponse {
+    count: i32,
+    plan: String,
+    assignment: String,
+}
+
+#[derive(FromRow)]
+struct CourseRow {
+    id: i32,
+    university: String,
+    title: String,
+    english_title: String,
+    department: String,
+    lecture_type: String,
+    code: String,
+    credit: i32,
+    year: i32,
+    language: String,
+    url: String,
+    r#abstract: String,
+    goal: String,
+    experience: bool,
+    flow: String,
+    out_of_class: String,
+    textbook: String,
+    reference_book: String,
+    assessment: String,
+    prerequisite: String,
+    contact: String,
+    office_hour: String,
+    note: String,
+}
+
+#[derive(FromRow)]
+struct KeywordRow {
+    id: i32,
+    course_id: i32,
+    keyword: String,
+}
+
+#[derive(FromRow)]
+struct CompetencyRow {
+    id: i32,
+    course_id: i32,
+    competency: String,
+}
+
+#[derive(FromRow)]
+struct ScheduleRow {
+    id: i32,
+    course_id: i32,
+    count: i32,
+    plan: String,
+    assignment: String,
+}
+
+#[derive(FromRow)]
+struct RelatedCourseRow {
+    id: i32,
+    course_id: i32,
+    related_course_code: String,
+}
+
+pub async fn get_course(pool: &SqlitePool, id: i32) -> CourseResponse {
+    let mut tx = pool.begin().await.unwrap();
+
+    let course = sqlx::query_as::<_, CourseRow>("SELECT * FROM courses WHERE id = ?")
+        .bind(id)
+        .fetch_one(&mut *tx)
+        .await
+        .unwrap();
+
+    let lecturers = sqlx::query_as::<_, LecturerRow>("SELECT * FROM lecturers WHERE course_id = ?")
+        .bind(id)
+        .fetch_all(&mut *tx)
+        .await
+        .unwrap();
+
+    let timetables =
+        sqlx::query_as::<_, TimetableRow>("SELECT * FROM timetables WHERE course_id = ?")
+            .bind(id)
+            .fetch_all(&mut *tx)
+            .await
+            .unwrap();
+
+    let semesters = sqlx::query_as::<_, SemesterRow>("SELECT * FROM semesters WHERE course_id = ?")
+        .bind(id)
+        .fetch_all(&mut *tx)
+        .await
+        .unwrap();
+
+    let keywords = sqlx::query_as::<_, KeywordRow>("SELECT * FROM keywords WHERE course_id = ?")
+        .bind(id)
+        .fetch_all(&mut *tx)
+        .await
+        .unwrap();
+
+    let competencies =
+        sqlx::query_as::<_, CompetencyRow>("SELECT * FROM competencies WHERE course_id = ?")
+            .bind(id)
+            .fetch_all(&mut *tx)
+            .await
+            .unwrap();
+
+    let schedules = sqlx::query_as::<_, ScheduleRow>("SELECT * FROM schedules WHERE course_id = ?")
+        .bind(id)
+        .fetch_all(&mut *tx)
+        .await
+        .unwrap();
+
+    let related_courses =
+        sqlx::query_as::<_, RelatedCourseRow>("SELECT * FROM related_courses WHERE course_id = ?")
+            .bind(id)
+            .fetch_all(&mut *tx)
+            .await
+            .unwrap();
+
+    tx.commit().await.unwrap();
+
+    CourseResponse {
+        id: course.id,
+        university: course.university,
+        title: course.title,
+        english_title: course.english_title,
+        department: course.department,
+        lecturer: lecturers
+            .iter()
+            .map(|lecturer| LecturerResponse {
+                id: lecturer.id,
+                name: lecturer.name.clone(),
+                url: lecturer.url.clone(),
+            })
+            .collect(),
+        lecture_type: course.lecture_type,
+        timetable: timetables
+            .iter()
+            .map(|timetable| TimetableResponse {
+                course_id: timetable.course_id,
+                day_of_week: timetable.day,
+                period: timetable.periods,
+                room: timetable.room.clone(),
+            })
+            .collect(),
+        code: course.code,
+        credit: course.credit,
+        year: course.year,
+        semester: semesters.iter().map(|semester| semester.semester).collect(),
+        language: course.language,
+        course_detail: CourseDetailResponse {
+            abst: course.r#abstract,
+            goal: course.goal,
+            experience: course.experience,
+            keyword: keywords
+                .iter()
+                .map(|keyword| keyword.keyword.clone())
+                .collect(),
+            competencies: competencies
+                .iter()
+                .map(|competency| competency.competency.clone())
+                .collect(),
+            flow: course.flow,
+            schedule: schedules
+                .iter()
+                .map(|schedule| ScheduleResponse {
+                    count: schedule.count,
+                    plan: schedule.plan.clone(),
+                    assignment: schedule.assignment.clone(),
+                })
+                .collect(),
+            out_of_class: course.out_of_class,
+            textbook: course.textbook,
+            reference_book: course.reference_book,
+            assessment: course.assessment,
+            related_course: related_courses
+                .iter()
+                .map(|related_course| related_course.related_course_code.clone())
+                .collect(),
+            prerequisite: course.prerequisite,
+            contact: course.contact,
+            office_hour: course.office_hour,
+            note: course.note,
+        },
+        url: course.url,
+    }
 }

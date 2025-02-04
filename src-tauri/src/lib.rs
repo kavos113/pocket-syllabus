@@ -8,7 +8,7 @@ mod database;
 mod sample;
 mod scrape;
 
-use crate::database::{CourseListItem, SearchQuery};
+use crate::database::{CourseListItem, CourseResponse, SearchQuery};
 pub use scrape::Course;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -170,6 +170,13 @@ async fn search_courses(
     Ok(courses)
 }
 
+#[tauri::command]
+async fn get_course(sqlite_pool: State<'_, SqlitePool>, id: i32) -> Result<CourseResponse, ()> {
+    let course = database::get_course(&*sqlite_pool, id).await;
+
+    Ok(course)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let sqlite_pool = block_on(database::create_sqlite_pool("./database.db")).unwrap();
@@ -181,7 +188,8 @@ pub fn run() {
             greet,
             fetch_test,
             fetch,
-            search_courses
+            search_courses,
+            get_course
         ])
         .setup(|app| {
             app.manage(sqlite_pool);
