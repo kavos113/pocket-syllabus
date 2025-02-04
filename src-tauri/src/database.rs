@@ -254,7 +254,7 @@ pub struct SearchQuery {
     pub title: Vec<String>,
     pub lecturer: Vec<String>,
     pub grade: Vec<String>,
-    pub quarter: Vec<String>,
+    pub quarter: Vec<Semester>,
     pub timetable: Vec<TimetableQuery>,
 }
 
@@ -277,7 +277,7 @@ pub struct CourseListItem {
     credit: i32,
 }
 
-#[derive(FromRow)]
+#[derive(FromRow, Debug)]
 struct CourseListItemRow {
     id: i32,
     university: String,
@@ -290,17 +290,35 @@ struct CourseListItemRow {
 
 #[derive(FromRow)]
 struct TimetableRow {
+    id: i32,
+    course_id: i32,
     day: i32,
     periods: i32,
+    room: String,
+}
+
+#[derive(FromRow)]
+struct LecturerRow {
+    // id: i32,
+    // course_id: i32,
+    name: String,
+    url: String,
+}
+
+#[derive(FromRow)]
+struct SemesterRow {
+    id: i32,
+    course_id: i32,
+    semester: i32,
 }
 
 pub async fn search_courses(pool: &SqlitePool, search_query: SearchQuery) -> Vec<CourseListItem> {
     let mut tx = pool.begin().await.unwrap();
 
-    let query = "SELECT id, university, code, title, department, credit, year FROM courses";
+    let query = "SELECT id, university, code, title, department, credit, year FROM courses ";
     let mut constraints = Vec::new();
 
-    if search_query.university.len() > 0 {
+    if !search_query.university.is_empty() {
         constraints.push(format!(
             "university IN ({})",
             search_query
@@ -312,7 +330,7 @@ pub async fn search_courses(pool: &SqlitePool, search_query: SearchQuery) -> Vec
         ));
     }
 
-    if search_query.department.len() > 0 {
+    if !search_query.department.is_empty() {
         constraints.push(format!(
             "department IN ({})",
             search_query
@@ -324,7 +342,7 @@ pub async fn search_courses(pool: &SqlitePool, search_query: SearchQuery) -> Vec
         ));
     }
 
-    if search_query.year.len() > 0 {
+    if !search_query.year.is_empty() {
         constraints.push(format!(
             "year IN ({})",
             search_query
@@ -336,49 +354,21 @@ pub async fn search_courses(pool: &SqlitePool, search_query: SearchQuery) -> Vec
         ));
     }
 
-    if search_query.title.len() > 0 {
-        constraints.push(format!(
-            "language IN ({})",
-            search_query
-                .title
-                .iter()
-                .map(|s| format!("'{}'", s))
-                .collect::<Vec<String>>()
-                .join(",")
-        ));
-    }
-
-    if search_query.lecturer.len() > 0 {
-        constraints.push(format!(
-            "lecturer IN ({})",
-            search_query
-                .lecturer
-                .iter()
-                .map(|s| format!("'{}'", s))
-                .collect::<Vec<String>>()
-                .join(",")
-        ));
-    }
-
-    if search_query.grade.len() > 0 {
-        constraints.push(format!(
-            "grade IN ({})",
-            search_query
-                .grade
-                .iter()
-                .map(|s| format!("'{}'", s))
-                .collect::<Vec<String>>()
-                .join(",")
-        ));
-    }
-
-    if search_query.quarter.len() > 0 {
+    if !search_query.quarter.is_empty() {
         constraints.push(format!(
             "quarter IN ({})",
             search_query
                 .quarter
                 .iter()
-                .map(|s| format!("'{}'", s))
+                .map(|s| format!(
+                    "'{}'",
+                    match s {
+                        Semester::First => 1,
+                        Semester::Second => 2,
+                        Semester::Third => 3,
+                        Semester::Fourth => 4,
+                    }
+                ))
                 .collect::<Vec<String>>()
                 .join(",")
         ));
@@ -387,11 +377,237 @@ pub async fn search_courses(pool: &SqlitePool, search_query: SearchQuery) -> Vec
     let query = format!(
         "{}{}{}",
         query,
-        if constraints.len() > 0 { "WHERE " } else { "" },
+        if !constraints.is_empty() {
+            "WHERE "
+        } else {
+            ""
+        },
         constraints.join(" AND ")
     );
 
     println!("query: {}", query);
 
-    Vec::new()
+    let mut rows = sqlx::query_as::<_, CourseListItemRow>(&query)
+        .fetch_all(&mut *tx)
+        .await
+        .unwrap();
+
+    tx.commit().await.unwrap();
+
+    // grade
+    if !search_query.grade.is_empty() {
+        let grades = search_query
+            .grade
+            .iter()
+            .map(|s| match s.as_str() {
+                "100" => '1',
+                "200" => '2',
+                "300" => '3',
+                "400" => '4',
+                "500" => '5',
+                "600" => '6',
+                _ => '0',
+            })
+            .collect::<Vec<char>>();
+
+        rows.retain(|row| {
+            grades
+                .iter()
+                .any(|grade| row.code.chars().nth(5).unwrap() == *grade)
+        });
+    }
+
+    // timetable
+    if !search_query.timetable.is_empty() {
+        let timetable_query = format!(
+            "SELECT course_id FROM timetables WHERE day IN ({}) AND periods IN ({})",
+            search_query
+                .timetable
+                .iter()
+                .map(|t| format!(
+                    "{}",
+                    match t.day {
+                        Day::Monday => {
+                            1
+                        }
+                        Day::Tuesday => {
+                            2
+                        }
+                        Day::Wednesday => {
+                            3
+                        }
+                        Day::Thursday => {
+                            4
+                        }
+                        Day::Friday => {
+                            5
+                        }
+                        Day::Saturday => {
+                            6
+                        }
+                        Day::Sunday => {
+                            0
+                        }
+                    }
+                ))
+                .collect::<Vec<String>>()
+                .join(","),
+            search_query
+                .timetable
+                .iter()
+                .map(|t| format!(
+                    "{}",
+                    match t.period {
+                        Period::First => {
+                            1
+                        }
+                        Period::Second => {
+                            2
+                        }
+                        Period::Third => {
+                            3
+                        }
+                        Period::Fourth => {
+                            4
+                        }
+                        Period::Fifth => {
+                            5
+                        }
+                        Period::Sixth => {
+                            6
+                        }
+                    }
+                ))
+                .collect::<Vec<String>>()
+                .join(",")
+        );
+
+        let mut tx = pool.begin().await.unwrap();
+
+        let timetable_ids = sqlx::query_as::<_, TimetableRow>(&timetable_query)
+            .fetch_all(&mut *tx)
+            .await
+            .unwrap();
+
+        tx.commit().await.unwrap();
+
+        rows.retain(|row| {
+            timetable_ids
+                .iter()
+                .any(|timetable_id| timetable_id.course_id == row.id)
+        });
+    }
+
+    let mut results = Vec::with_capacity(rows.len());
+
+    for row in rows {
+        let mut tx = pool.begin().await.unwrap();
+
+        let lecturers =
+            sqlx::query_as::<_, LecturerRow>("SELECT * FROM lecturers WHERE course_id = ?")
+                .bind(row.id)
+                .fetch_all(&mut *tx)
+                .await
+                .unwrap();
+
+        let timetables =
+            sqlx::query_as::<_, TimetableRow>("SELECT * FROM timetables WHERE course_id = ?")
+                .bind(row.id)
+                .fetch_all(&mut *tx)
+                .await
+                .unwrap();
+
+        let semesters =
+            sqlx::query_as::<_, SemesterRow>("SELECT * FROM semesters WHERE course_id = ?")
+                .bind(row.id)
+                .fetch_all(&mut *tx)
+                .await
+                .unwrap();
+
+        tx.commit().await.unwrap();
+
+        let lectures = lecturers
+            .iter()
+            .map(|lecturer| lecturer.name.clone())
+            .collect::<Vec<String>>()
+            .join(", ");
+
+        let timetables = timetables
+            .iter()
+            .map(|timetable| {
+                format!(
+                    "{}{}",
+                    match timetable.day {
+                        0 => "日",
+                        1 => "月",
+                        2 => "火",
+                        3 => "水",
+                        4 => "木",
+                        5 => "金",
+                        6 => "土",
+                        _ => "",
+                    },
+                    match timetable.periods {
+                        1 => "1-2",
+                        2 => "3-4",
+                        3 => "5-6",
+                        4 => "7-8",
+                        5 => "9-10",
+                        6 => "11-12",
+                        _ => "",
+                    }
+                )
+            })
+            .collect::<Vec<String>>()
+            .join(", ");
+
+        let semesters = semesters
+            .iter()
+            .map(|semester| {
+                (match semester.semester {
+                    1 => "1Q",
+                    2 => "2Q",
+                    3 => "3Q",
+                    4 => "4Q",
+                    _ => "",
+                })
+                .to_string()
+            })
+            .collect::<Vec<String>>()
+            .join(", ");
+
+        results.push(CourseListItem {
+            id: row.id,
+            university: row.university,
+            code: row.code,
+            title: row.title,
+            lecturer: lectures,
+            timetable: timetables,
+            semester: semesters,
+            department: row.department,
+            credit: row.credit,
+        });
+    }
+
+    // title
+    if !search_query.title.is_empty() {
+        results.retain(|result| {
+            search_query
+                .title
+                .iter()
+                .any(|title| result.title.contains(title))
+        });
+    }
+
+    // lecturer
+    if !search_query.lecturer.is_empty() {
+        results.retain(|result| {
+            search_query
+                .lecturer
+                .iter()
+                .any(|lecturer| result.lecturer.contains(lecturer))
+        });
+    }
+
+    results
 }

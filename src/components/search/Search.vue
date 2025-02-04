@@ -3,7 +3,15 @@ import FetchButton from './FetchButton.vue';
 import SearchField from './SearchField.vue';
 import { ref } from 'vue';
 import SimpleButton from '../common/SimpleButton.vue';
-import { Day, Period } from '../../scripts/consts.ts';
+import {
+  Day,
+  DayQuery,
+  Period,
+  PeriodQuery,
+  SemesterQuery,
+  toDayQuery,
+  toPeriodQuery,
+} from '../../scripts/consts.ts';
 import { invoke } from '@tauri-apps/api/core';
 
 export type SearchComboBox = 'university' | 'department' | 'year';
@@ -18,6 +26,13 @@ export type SearchTimetableQuery = {
   period: Period;
 };
 
+export type SearchTimetableForQuery = {
+  day: DayQuery;
+  period: PeriodQuery;
+};
+
+type Grade = '100' | '200' | '300' | '400' | '500' | '600';
+
 interface SearchQuery {
   university: string[];
   department: string[];
@@ -27,6 +42,17 @@ interface SearchQuery {
   grade: string[];
   quarter: string[];
   timetable: SearchTimetableQuery[];
+}
+
+interface SearchForQuery {
+  university: string[];
+  department: string[];
+  year: string[];
+  title: string[];
+  lecturer: string[];
+  grade: Grade[];
+  quarter: SemesterQuery[];
+  timetable: SearchTimetableForQuery[];
 }
 
 const condition = ref<SearchQuery>({
@@ -70,8 +96,54 @@ const onTimeTable = (items: SearchTimetableQuery[]) => {
 };
 
 const onSearch = async () => {
-  invoke('search_courses', { searchQuery: condition.value }).then(() => {
-    console.log('Searched');
+  const searchForQuery: SearchForQuery = {
+    university: condition.value.university,
+    department: condition.value.department,
+    year: condition.value.year,
+    title: condition.value.title,
+    lecturer: condition.value.lecturer,
+    grade: [],
+    quarter: [],
+    timetable: [],
+  };
+
+  condition.value.quarter.forEach((item) => {
+    if (item === '1Q') {
+      searchForQuery.quarter.push('First');
+    } else if (item === '2Q') {
+      searchForQuery.quarter.push('Second');
+    } else if (item === '3Q') {
+      searchForQuery.quarter.push('Third');
+    } else if (item === '4Q') {
+      searchForQuery.quarter.push('Fourth');
+    }
+  });
+
+  condition.value.timetable.forEach((item) => {
+    searchForQuery.timetable.push({
+      day: toDayQuery(item.day),
+      period: toPeriodQuery(item.period),
+    });
+  });
+
+  condition.value.grade.forEach((item) => {
+    if (item === '学士1年') {
+      searchForQuery.grade.push('100');
+    } else if (item === '学士2年') {
+      searchForQuery.grade.push('200');
+    } else if (item === '学士3年') {
+      searchForQuery.grade.push('300');
+    } else if (item === '修士1年') {
+      searchForQuery.grade.push('400');
+    } else if (item === '修士2年') {
+      searchForQuery.grade.push('500');
+    } else if (item === '博士課程') {
+      searchForQuery.grade.push('600');
+    }
+  });
+
+  invoke('search_courses', { searchQuery: searchForQuery }).then((results) => {
+    console.dir(results);
   });
 };
 

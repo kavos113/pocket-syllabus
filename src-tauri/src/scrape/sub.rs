@@ -97,7 +97,7 @@ pub enum Period {
     Sixth,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum Semester {
     First,
     Second,

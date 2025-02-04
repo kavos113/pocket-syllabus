@@ -1,12 +1,58 @@
 export type Day = '月' | '火' | '水' | '木' | '金';
 export type Period = '1' | '2' | '3' | '4' | '5';
+export type DayQuery =
+  | 'Monday'
+  | 'Tuesday'
+  | 'Wednesday'
+  | 'Thursday'
+  | 'Friday'
+  | 'Saturday'
+  | 'Sunday';
+export type PeriodQuery =
+  | 'First'
+  | 'Second'
+  | 'Third'
+  | 'Fourth'
+  | 'Fifth'
+  | 'Sixth';
+export type SemesterQuery = 'First' | 'Second' | 'Third' | 'Fourth';
+export function toDayQuery(day: Day): DayQuery {
+  switch (day) {
+    case '月':
+      return 'Monday';
+    case '火':
+      return 'Tuesday';
+    case '水':
+      return 'Wednesday';
+    case '木':
+      return 'Thursday';
+    case '金':
+      return 'Friday';
+  }
+}
+
+export function toPeriodQuery(period: Period): PeriodQuery {
+  switch (period) {
+    case '1':
+      return 'First';
+    case '2':
+      return 'Second';
+    case '3':
+      return 'Third';
+    case '4':
+      return 'Fourth';
+    case '5':
+      return 'Fifth';
+  }
+}
+
 export const DAYS: Day[] = ['月', '火', '水', '木', '金'];
 export const PERIODS: Period[] = ['1', '2', '3', '4', '5'];
 export const GRADES = [
   '学士1年',
   '学士2年',
   '学士3年',
-  '修士1程',
+  '修士1年',
   '修士2年',
   '博士課程',
 ];
