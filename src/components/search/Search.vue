@@ -58,6 +58,7 @@ interface SearchForQuery {
 
 const emits = defineEmits<{
   (event: 'search', results: CourseListItem[]): void;
+  (event: 'back'): void;
 }>();
 
 const condition = ref<SearchQuery>({
@@ -147,7 +148,7 @@ const year = ref<string[]>([]);
 
 <template>
   <div class="search-wrapper">
-    <FetchButton />
+    <FetchButton class="fetch" />
     <SearchField
       @click-menu-item="onSearchConditionChange"
       @timetable="onTimeTable"
@@ -161,6 +162,11 @@ const year = ref<string[]>([]);
       <p>大学: {{ university.join(', ') }}</p>
       <p>開講: {{ department.join(', ') }}</p>
       <p>年度: {{ year.join(', ') }}</p>
+      <SimpleButton
+        text="戻る"
+        @click="emits('back')"
+        class="back"
+      />
     </div>
   </div>
 </template>
@@ -176,5 +182,23 @@ const year = ref<string[]>([]);
 
 .button {
   width: 110px;
+}
+
+.back {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .fetch {
+    display: none;
+  }
+
+  .back {
+    display: block;
+  }
+
+  .search-wrapper {
+    background-color: var(--grayborder);
+  }
 }
 </style>

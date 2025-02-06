@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import ComboBox from '../common/ComboBox.vue';
 import SearchBox from '../common/SearchBox.vue';
-import { DEPARTMENTS, UNIVERSITIES, YEARS } from '../../scripts/consts.ts';
+import {
+  DEPARTMENTS,
+  MOBILE_DEPARTMENTS,
+  UNIVERSITIES,
+  YEARS,
+} from '../../scripts/consts.ts';
 import { SearchComboBox } from './Search.vue';
 import { ref, watch } from 'vue';
 
@@ -38,6 +43,12 @@ watch([title, lecturer], () => {
     />
     <ComboBox
       :items="DEPARTMENTS"
+      class="desktop"
+      @select-item="onDepartmentSelect"
+    />
+    <ComboBox
+      :items="MOBILE_DEPARTMENTS"
+      class="mobile"
       @select-item="onDepartmentSelect"
     />
     <ComboBox
@@ -62,5 +73,23 @@ watch([title, lecturer], () => {
   flex-direction: column;
   align-items: flex-start;
   gap: 24px;
+}
+
+.desktop {
+  display: block;
+}
+
+.mobile {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .desktop {
+    display: none;
+  }
+
+  .mobile {
+    display: block;
+  }
 }
 </style>

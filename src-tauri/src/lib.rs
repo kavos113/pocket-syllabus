@@ -192,18 +192,26 @@ pub fn run() {
             get_course
         ])
         .setup(|app| {
-            let db_path = app
-                .path()
-                .resolve("database.db", BaseDirectory::Resource)
-                .unwrap();
-            let db_path = db_path.as_path().to_str().unwrap();
-            let db_path = if db_path.starts_with("\\\\?\\") {
-                &db_path[4..]
-            } else {
-                db_path
-            };
+            let app_dir = app.path().app_data_dir().unwrap();
+
+            std::fs::create_dir_all(&app_dir).expect("Failed to create app data directory");
+
+            let db_path = app_dir.join("database.db");
+            let db_path = db_path.to_str().unwrap();
+
+            // let db_path = app
+            //     .path()
+            //     .resolve("database.db", BaseDirectory::Resource)
+            //     .unwrap();
+            // let db_path = db_path.as_path().to_str().unwrap();
+            // let db_path = if db_path.starts_with("\\\\?\\") {
+            //     &db_path[4..]
+            // } else {
+            //     db_path
+            // };
+            println!("db_path: {}", db_path);
             let sqlite_pool = block_on(database::create_sqlite_pool(db_path)).unwrap();
-            //block_on(database::migrate(&sqlite_pool)).unwrap();
+            block_on(database::migrate(&sqlite_pool)).unwrap();
 
             app.manage(sqlite_pool);
             app.manage(app.app_handle().clone());

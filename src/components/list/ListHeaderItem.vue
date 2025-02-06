@@ -121,4 +121,52 @@ const onSort = (key: string) => {
   grid-column: 23 / 25;
   grid-row: 1 / 2;
 }
+
+@media (max-width: 600px) {
+  .item-wrapper {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: 1fr;
+  }
+
+  .university {
+    display: none;
+  }
+
+  .code {
+    display: none;
+  }
+
+  .name {
+    grid-column: 1 / 6;
+    grid-row: 1 / 2;
+    cursor: pointer;
+  }
+
+  .lecturer {
+    display: none;
+  }
+
+  .timetable {
+    grid-column: 6 / 8;
+    grid-row: 1 / 2;
+  }
+
+  .semester {
+    grid-column: 8 / 9;
+    grid-row: 1 / 2;
+    overflow: hidden;
+    text-wrap: nowrap;
+  }
+
+  .department {
+    grid-column: 9 / 11;
+    grid-row: 1 / 2;
+    cursor: pointer;
+  }
+
+  .credit {
+    display: none;
+  }
+}
 </style>

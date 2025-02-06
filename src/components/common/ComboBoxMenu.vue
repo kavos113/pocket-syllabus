@@ -120,8 +120,8 @@ const clickMenuItem = (key: string) => {
 .subMenu {
   list-style-type: none;
   position: absolute;
-  left: 100%;
-  top: 0;
+  left: 0;
+  top: 100%;
   width: 100%;
   margin: 0;
   padding: 0;

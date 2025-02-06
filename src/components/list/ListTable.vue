@@ -5,6 +5,7 @@ import ListItem from './ListItem.vue';
 import CourseDetail from './CourseDetail.vue';
 import { ref } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
+import SimpleButton from '../common/SimpleButton.vue';
 
 const props = defineProps<{
   items: CourseListItem[];
@@ -84,20 +85,26 @@ const closeDetail = async () => {
         @click="onListItemClick(item.id)"
         class="item"
       />
-      <CourseDetail
-        class="detail"
-        :class="{ detailActive: isDetailOpen }"
-        :content="detailsData as Course"
-      />
-      <div
-        class="overlay"
-        :class="{
-          overlayActive: isDetailOpen,
-          overlayActiveZIndex: isOverlayActive,
-        }"
-        @click="closeDetail"
-      ></div>
     </div>
+    <CourseDetail
+      class="detail"
+      :class="{ detailActive: isDetailOpen }"
+      :content="detailsData as Course"
+    />
+    <SimpleButton
+      text="戻る"
+      class="back-motomoto"
+      :class="{ back: isDetailOpen }"
+      @click="closeDetail"
+    />
+    <div
+      class="overlay"
+      :class="{
+        overlayActive: isDetailOpen,
+        overlayActiveZIndex: isOverlayActive,
+      }"
+      @click="closeDetail"
+    ></div>
   </div>
 </template>
 
@@ -140,7 +147,7 @@ const closeDetail = async () => {
 
 .overlayActive {
   z-index: 1;
-  opacity: 0.03;
+  opacity: 1;
 }
 
 .overlayActiveZIndex {
@@ -153,5 +160,33 @@ const closeDetail = async () => {
 
 .item {
   cursor: pointer;
+}
+
+.back {
+  display: none;
+}
+
+.back-motomoto {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .back {
+    display: block;
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 101;
+    box-shadow: 0 0 15px var(--stmain);
+  }
+
+  .detail {
+    width: 100%;
+    transform: translateX(100%);
+  }
+
+  .detailActive {
+    transform: translateX(0);
+  }
 }
 </style>

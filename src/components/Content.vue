@@ -3,6 +3,7 @@ import ListTable from './list/ListTable.vue';
 import Search from './search/Search.vue';
 import { ref } from 'vue';
 import { CourseListItem } from '../scripts/course.ts';
+import SimpleButton from './common/SimpleButton.vue';
 
 const listItems = ref<CourseListItem[]>([]);
 
@@ -81,13 +82,30 @@ const onSort = (key: string) => {
       break;
   }
 };
+
+const isSearchShow = ref<boolean>(false);
+
+const onMenuClick = () => {
+  isSearchShow.value = true;
+};
+
+const onBack = () => {
+  isSearchShow.value = false;
+};
 </script>
 
 <template>
   <div class="content-container">
     <Search
       class="search"
+      :class="{ 'search-clicked': isSearchShow }"
       @search="onSearch"
+      @back="onBack"
+    />
+    <SimpleButton
+      text="メニュー"
+      class="search-menu"
+      @click="onMenuClick"
     />
     <ListTable
       class="table"
@@ -116,5 +134,33 @@ const onSort = (key: string) => {
 .search {
   grid-column: 1 / 2;
   grid-row: 1 / 2;
+}
+
+.search-menu {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .content-container {
+    width: 100%;
+    height: calc(100% - 74px);
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .search-menu {
+    display: block;
+  }
+
+  .search {
+    position: absolute;
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+  }
+
+  .search-clicked {
+    transform: translateX(0);
+  }
 }
 </style>
