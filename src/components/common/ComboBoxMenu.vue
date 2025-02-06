@@ -120,8 +120,8 @@ const clickMenuItem = (key: string) => {
 .subMenu {
   list-style-type: none;
   position: absolute;
-  left: 0;
-  top: 100%;
+  left: 100%;
+  top: 0;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -151,11 +151,10 @@ const clickMenuItem = (key: string) => {
   line-height: normal;
 }
 
-.close {
-  display: none;
-}
-
-.open {
-  display: block;
+@media (max-width: 600px) {
+  .subMenu {
+    left: 0;
+    top: 100%;
+  }
 }
 </style>
