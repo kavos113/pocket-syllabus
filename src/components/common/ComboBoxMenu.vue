@@ -151,6 +151,14 @@ const clickMenuItem = (key: string) => {
   line-height: normal;
 }
 
+.close {
+  display: none;
+}
+
+.open {
+  display: block;
+}
+
 @media (max-width: 600px) {
   .subMenu {
     left: 0;
