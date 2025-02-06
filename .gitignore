@@ -25,3 +25,4 @@ dist-ssr
 data
 src-tauri/src/sample.rs
 src-tauri/db/001_data.sql
+keystore.properties
