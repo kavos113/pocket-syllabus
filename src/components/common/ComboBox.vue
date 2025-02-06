@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import ComboBoxMenu from './ComboBoxMenu.vue';
 import { ref } from 'vue';
+import { Menu } from '../../scripts/consts.ts';
 
 const props = defineProps<{
-  items: object;
+  items: Menu;
 }>();
 
 const emits = defineEmits<{

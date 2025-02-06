@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { Menu } from '../../scripts/consts.ts';
 
 const props = defineProps<{
-  items: object;
+  items: Menu;
 }>();
 
 const emits = defineEmits<{
@@ -62,7 +63,7 @@ const clickMenuItem = (key: string) => {
       </div>
       <template :class="[isOpen(key) ? 'open' : 'close']">
         <ComboBoxMenu
-          :items="item"
+          :items="item as Menu"
           v-if="isObject(item)"
           class="subMenu"
           @click-menu-item="clickMenuItem"

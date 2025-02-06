@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CheckBoxes from './CheckBoxes.vue';
 import Timetable from './Timetable.vue';
-import { GRADES, QUATERS } from '../../scripts/consts.ts';
+import { GRADES, QUARTERS } from '../../scripts/consts.ts';
 import { SearchCheckBox, SearchTimetableQuery } from './Search.vue';
 
 const emits = defineEmits<{
@@ -31,7 +31,7 @@ const onCheckTimetable = (items: SearchTimetableQuery[]) => {
     />
     <CheckBoxes
       checkbox-id="quater"
-      :contents="QUATERS"
+      :contents="QUARTERS"
       @check-item="onCheckQuater"
     />
     <Timetable @check-item="onCheckTimetable" />

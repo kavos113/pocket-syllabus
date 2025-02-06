@@ -8,6 +8,10 @@ use std::str::FromStr;
 type DbResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 pub async fn create_sqlite_pool(database_path: &str) -> DbResult<SqlitePool> {
+    if !std::path::Path::new(database_path).exists() {
+        let _ = std::fs::File::create(database_path)?;
+    }
+
     let connection_options = SqliteConnectOptions::from_str(database_path)?
         .create_if_missing(true)
         .journal_mode(SqliteJournalMode::Wal)
@@ -21,7 +25,7 @@ pub async fn create_sqlite_pool(database_path: &str) -> DbResult<SqlitePool> {
 }
 
 pub async fn migrate(pool: &SqlitePool) -> DbResult<()> {
-    sqlx::migrate!("./db").run(pool).await?;
+    sqlx::migrate!("./migrations").run(pool).await?;
 
     Ok(())
 }
@@ -608,6 +612,8 @@ pub async fn search_courses(pool: &SqlitePool, search_query: SearchQuery) -> Vec
                 .any(|lecturer| result.lecturer.contains(lecturer))
         });
     }
+
+    results.retain(|result| !result.lecturer.contains("教員"));
 
     results
 }

@@ -23,7 +23,7 @@ const checked = ref<boolean[]>([]);
 
 watch(
   checked,
-  (newValue, oldValue) => {
+  (newValue, _) => {
     const checkedItems: string[] = [];
     newValue.forEach((value, index) => {
       if (value) {

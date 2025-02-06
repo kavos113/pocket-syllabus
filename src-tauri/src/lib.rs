@@ -1,7 +1,10 @@
 use crate::scrape::{html_to_course, html_to_course_abstracts};
+use sqlx::sqlite::SqliteError;
 use sqlx::SqlitePool;
+use std::process::Command;
 use std::time;
 use tauri::async_runtime::block_on;
+use tauri::path::BaseDirectory;
 use tauri::{Emitter, Manager, State};
 
 mod database;
@@ -179,9 +182,6 @@ async fn get_course(sqlite_pool: State<'_, SqlitePool>, id: i32) -> Result<Cours
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let sqlite_pool = block_on(database::create_sqlite_pool("./database.db")).unwrap();
-    block_on(database::migrate(&sqlite_pool)).unwrap();
-
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
@@ -192,6 +192,19 @@ pub fn run() {
             get_course
         ])
         .setup(|app| {
+            let db_path = app
+                .path()
+                .resolve("database.db", BaseDirectory::Resource)
+                .unwrap();
+            let db_path = db_path.as_path().to_str().unwrap();
+            let db_path = if db_path.starts_with("\\\\?\\") {
+                &db_path[4..]
+            } else {
+                db_path
+            };
+            let sqlite_pool = block_on(database::create_sqlite_pool(db_path)).unwrap();
+            //block_on(database::migrate(&sqlite_pool)).unwrap();
+
             app.manage(sqlite_pool);
             app.manage(app.app_handle().clone());
             Ok(())

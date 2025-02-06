@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ComboBox from '../common/ComboBox.vue';
 import SearchBox from '../common/SearchBox.vue';
-import { DEPARTMENTS, UNIVERCITIES, YEARS } from '../../scripts/consts.ts';
+import { DEPARTMENTS, UNIVERSITIES, YEARS } from '../../scripts/consts.ts';
 import { SearchComboBox } from './Search.vue';
 import { ref, watch } from 'vue';
 
@@ -33,7 +33,7 @@ watch([title, lecturer], () => {
 <template>
   <div class="search-box-wrapper">
     <ComboBox
-      :items="UNIVERCITIES"
+      :items="UNIVERSITIES"
       @select-item="onUniversitySelect"
     />
     <ComboBox

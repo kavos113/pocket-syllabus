@@ -56,9 +56,9 @@ export const GRADES = [
   '修士2年',
   '博士課程',
 ];
-export const QUATERS = ['1Q', '2Q', '3Q', '4Q'];
-export const UNIVERCITIES = { 大学を選択: ['東京工業大学', '一橋大学'] };
-export const DEPARTMENTS = {
+export const QUARTERS = ['1Q', '2Q', '3Q', '4Q'];
+export const UNIVERSITIES: Menu = { 大学を選択: ['東京工業大学', '一橋大学'] };
+export const DEPARTMENTS: Menu = {
   開講元を選択: {
     東京工業大学: {
       学士課程: {
@@ -159,6 +159,21 @@ export const DEPARTMENTS = {
     },
   },
 };
-export const YEARS = {
+export const YEARS: Menu = {
   年度を選択: ['2024年度'],
 };
+
+export type Menu =
+  | Record<
+      string,
+      | string[]
+      | Record<
+          string,
+          | string[]
+          | Record<
+              string,
+              string[] | Record<string, string[] | Record<string, string[]>>
+            >
+        >
+    >
+  | string[];

@@ -1,17 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { invoke } from '@tauri-apps/api/core';
 import './styles/style.css';
 import Title from './components/Title.vue';
 import Content from './components/Content.vue';
-
-const greetMsg = ref('');
-const name = ref('');
-
-async function greet() {
-  // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-  greetMsg.value = await invoke('greet', { name: name.value });
-}
 </script>
 
 <template>
