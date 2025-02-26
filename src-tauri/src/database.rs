@@ -358,26 +358,6 @@ pub async fn search_courses(pool: &SqlitePool, search_query: SearchQuery) -> Vec
         ));
     }
 
-    if !search_query.quarter.is_empty() {
-        constraints.push(format!(
-            "quarter IN ({})",
-            search_query
-                .quarter
-                .iter()
-                .map(|s| format!(
-                    "'{}'",
-                    match s {
-                        Semester::First => 1,
-                        Semester::Second => 2,
-                        Semester::Third => 3,
-                        Semester::Fourth => 4,
-                    }
-                ))
-                .collect::<Vec<String>>()
-                .join(",")
-        ));
-    }
-
     let query = format!(
         "{}{}{}",
         query,
@@ -424,7 +404,7 @@ pub async fn search_courses(pool: &SqlitePool, search_query: SearchQuery) -> Vec
     // timetable
     if !search_query.timetable.is_empty() {
         let timetable_query = format!(
-            "SELECT course_id FROM timetables WHERE day IN ({}) AND periods IN ({})",
+            "SELECT * FROM timetables WHERE day IN ({}) AND periods IN ({})",
             search_query
                 .timetable
                 .iter()
@@ -499,6 +479,50 @@ pub async fn search_courses(pool: &SqlitePool, search_query: SearchQuery) -> Vec
             timetable_ids
                 .iter()
                 .any(|timetable_id| timetable_id.course_id == row.id)
+        });
+    }
+
+    // semester
+    if !search_query.quarter.is_empty() {
+        let semester_query = format!(
+            "SELECT * FROM semesters WHERE semester IN ({})",
+            search_query
+                .quarter
+                .iter()
+                .map(|s| format!(
+                    "{}",
+                    match s {
+                        Semester::First => {
+                            1
+                        }
+                        Semester::Second => {
+                            2
+                        }
+                        Semester::Third => {
+                            3
+                        }
+                        Semester::Fourth => {
+                            4
+                        }
+                    }
+                ))
+                .collect::<Vec<String>>()
+                .join(",")
+        );
+
+        let mut tx = pool.begin().await.unwrap();
+
+        let semester_ids = sqlx::query_as::<_, SemesterRow>(&semester_query)
+            .fetch_all(&mut *tx)
+            .await
+            .unwrap();
+
+        tx.commit().await.unwrap();
+
+        rows.retain(|row| {
+            semester_ids
+                .iter()
+                .any(|semester_id| semester_id.course_id == row.id)
         });
     }
 

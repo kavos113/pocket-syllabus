@@ -138,6 +138,7 @@ const onSearch = async () => {
 
   invoke('search_courses', { searchQuery: searchForQuery }).then((results) => {
     emits('search', results as CourseListItem[]);
+    emits('back');
   });
 };
 
@@ -199,6 +200,8 @@ const year = ref<string[]>([]);
 
   .search-wrapper {
     background-color: var(--grayborder);
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 1);
+    padding: 10px;
   }
 }
 </style>

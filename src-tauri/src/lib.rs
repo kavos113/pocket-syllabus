@@ -8,7 +8,6 @@ use tauri::path::BaseDirectory;
 use tauri::{Emitter, Manager, State};
 
 mod database;
-mod sample;
 mod scrape;
 
 use crate::database::{CourseListItem, CourseResponse, SearchQuery};
@@ -183,6 +182,7 @@ async fn get_course(sqlite_pool: State<'_, SqlitePool>, id: i32) -> Result<Cours
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_cli::init())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             greet,
@@ -192,6 +192,8 @@ pub fn run() {
             get_course
         ])
         .setup(|app| {
+            app.handle().plugin(tauri_plugin_cli::init()).unwrap();
+
             let app_dir = app.path().app_data_dir().unwrap();
 
             std::fs::create_dir_all(&app_dir).expect("Failed to create app data directory");
